@@ -1,0 +1,9 @@
+apiVersion: solr.apache.org/v1beta1
+kind: SolrCloud
+metadata:
+  name: aks-iati-solr-dev
+spec:
+  replicas: 2
+  solrImage:
+    tag: "8.8.2"
+  solrJavaMem: "-Xms300m -Xmx300m"
