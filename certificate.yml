@@ -1,17 +1,28 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pkcs12-keystore-password
+stringData:
+  password-key: <KEYSTORE_PASSWORD> # 1Password
+
+---
+
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: tls-secret
-  namespace: ns-solr-prod
+  name: tls-secret-prod
   annotations:
     issue-temporary-certificate: "true"
 spec:
-  secretName: solr-tls-staging
+  secretName: solr-tls
   issuerRef:
     kind: ClusterIssuer
-    name: letsencrypt-staging
+    name: letsencrypt
+  commonName: "*.solr.iatistandard.org"
   dnsNames:
-    - solr.iatistandard.org
+    - "solr.iatistandard.org"
+    - "*.solr.iatistandard.org"
   keystores:
     pkcs12:
       create: true

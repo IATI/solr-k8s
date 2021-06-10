@@ -1,19 +1,28 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflare-api-token-secret
+type: Opaque
+stringData:
+  api-token: <CLOUDFLARE_API_TOKEN> # https://cert-manager.io/docs/configuration/acme/dns01/cloudflare/
+
+---
+
 apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-staging
+  name: letsencrypt
   namespace: cert-manager
 spec:
   acme:
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    server: https://acme-v02.api.letsencrypt.org/directory
     email: code@iatistandard.org
     privateKeySecretRef:
-      name: letsencrypt-staging-private-key
+      name: letsencrypt-private-key
     solvers:
-    - http01:
-        ingress:
-          class: nginx
-          podTemplate:
-            spec:
-              nodeSelector:
-                "kubernetes.io/os": linux
+      - dns01:
+          cloudflare:
+            email: niko@devinit.org
+            apiTokenSecretRef:
+              name: cloudflare-api-token-secret
+              key: api-token

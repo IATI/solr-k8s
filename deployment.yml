@@ -1,9 +1,68 @@
 apiVersion: solr.apache.org/v1beta1
 kind: SolrCloud
 metadata:
-  name: aks-iati-solr-dev
+  name: aks-iati-solr-prod
 spec:
-  replicas: 2
+  customSolrKubeOptions:
+    podOptions:
+      resources:
+        limits:
+          memory: 3Gi
+        requests:
+          cpu: 700m
+          memory: 3Gi
+  dataStorage:
+    persistent:
+      pvcTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 2Gi
+      reclaimPolicy: Delete
+  replicas: 3
   solrImage:
-    tag: "8.8.2"
-  solrJavaMem: "-Xms300m -Xmx300m"
+    repository: solr
+    tag: 8.8.2
+  solrJavaMem: -Xms500M -Xmx500M
+  updateStrategy:
+    method: Managed
+  zookeeperRef:
+    provided:
+      chroot: /explore
+      image:
+        pullPolicy: IfNotPresent
+        repository: pravega/zookeeper
+        tag: 0.2.9
+      persistence:
+        reclaimPolicy: Delete
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 2Gi
+      replicas: 3
+      zookeeperPodPolicy:
+        resources:
+          limits:
+            memory: 500Mi
+          requests:
+            cpu: 250m
+            memory: 500Mi
+  solrAddressability:
+    commonServicePort: 443
+    external:
+      domainName: solr.iatistandard.org
+      method: Ingress
+      nodePortOverride: 443
+      useExternalAddress: false
+    podPort: 8983
+  solrTLS:
+    pkcs12Secret:
+      name: solr-tls
+      key: keystore.p12
+    keyStorePasswordSecret:
+      name: pkcs12-keystore-password
+      key: password-key
+  solrSecurity:
+    authenticationType: Basic
