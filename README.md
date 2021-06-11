@@ -214,9 +214,15 @@ pw: prom-operator
   - [x] Basic Auth - https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#authentication-and-authorization
 - High Availability
   - [x] Azure Availability Zones - https://docs.microsoft.com/en-ca/azure/aks/availability-zones
-  - [ ] Solr Level Availability
+  - [ ] Solr Level HA
+      - [ ] Pod Affinity/AntiAffinity Rules
+      - [ ] Zone aware replica placement
 - Performance Monitoring
-  - [ ] Prometheus/Grafana
+  - [x] Prometheus/Grafana
+- Backups
+- [ ] Sizing
+  - Currently on "vmSize": "Standard_DS2_v2"
+  - Needed 4 Nodes (VMs) to support 3 Solr Nodes, 3 Zookeeper, + Monitoring suite. Potentially use 3 Nodes w/ more memory, same price?
 - CI/CD
   - Can (or should) I GitHub Actions this?
 
