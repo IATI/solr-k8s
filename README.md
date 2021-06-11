@@ -11,14 +11,14 @@ Repo containing kubernetes deployment information for IATI Solr Production insta
 az group create --resource-group rg-solr-PROD --location uksouth
 RG=rg-solr-PROD
 
-# Creating AKS Cluster with 3 nodes across availability zones
+# Creating AKS Cluster with 4 nodes across availability zones
 az aks create \
     --resource-group $RG \
     --name aks-solr-PROD \
     --generate-ssh-keys \
     --vm-set-type VirtualMachineScaleSets \
     --load-balancer-sku standard \
-    --node-count 3 \
+    --node-count 4 \
     --zones 1 2 3
 
 # Get context of your cluster and set that as your kubectl context
@@ -148,6 +148,19 @@ kubectl get secret aks-iati-solr-prod-solrcloud-security-bootstrap \
   -o jsonpath='{.data.solr}' | base64 --decode
 ```
 
+### HA
+
+Check Pods are distributed to unique Nodes
+```bash
+kubectl get po -l solr-cloud=iati-prod,technology=solr-cloud \
+  -o json | jq -r '.items | sort_by(.spec.nodeName)[] | [.spec.nodeName] | @tsv' | uniq | wc -l
+# 3
+
+kubectl get po -l solr-cloud=iati-prod,technology=zookeeper \
+  -o json | jq -r '.items | sort_by(.spec.nodeName)[] | [.spec.nodeName] | @tsv' | uniq | wc -l
+# 3
+```
+
 ### Monitoring
 
 Install Prometheus stack
@@ -215,7 +228,7 @@ pw: prom-operator
 - High Availability
   - [x] Azure Availability Zones - https://docs.microsoft.com/en-ca/azure/aks/availability-zones
   - [ ] Solr Level HA
-      - [ ] Pod Affinity/AntiAffinity Rules
+      - [x] Pod Affinity/AntiAffinity Rules
       - [ ] Zone aware replica placement
 - Performance Monitoring
   - [x] Prometheus/Grafana
@@ -242,25 +255,3 @@ https://lucidworks.com/post/running-solr-on-kubernetes-part-1/
 https://docs.microsoft.com/en-ca/azure/aks/ingress-basic
 
 https://solr.apache.org/operator/articles/explore-v030-gke.html
-
-## Issue
-
-### When adding Pod anti-affinity rules:
-
-❯ kubectl describe pod/aks-iati-solr-prod-solrcloud-2
-Name:           aks-iati-solr-prod-solrcloud-2
-Namespace:      default
-Priority:       0
-Node:           <none>
-Labels:         controller-revision-hash=aks-iati-solr-prod-solrcloud-698857d5d
-                solr-cloud=aks-iati-solr-prod
-                statefulset.kubernetes.io/pod-name=aks-iati-solr-prod-solrcloud-2
-                technology=solr-cloud
-Annotations:    solr.apache.org/solrXmlMd5: d5762e93617f75e208ecbbca00c079c6
-Status:         Pending
-
-Events:
-  Type     Reason            Age                     From               Message
-  ----     ------            ----                    ----               -------
-  Warning  FailedScheduling  3m26s (x10 over 4m45s)  default-scheduler  0/3 nodes are available: 1 node(s) didn't match pod affinity/anti-affinity, 1 node(s) didn't satisfy existing pods anti-affinity rules, 2 Insufficient memory.
-  Warning  FailedScheduling  44s (x3 over 3m15s)     default-scheduler  0/3 nodes are available: 3 Insufficient memory.

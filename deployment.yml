@@ -11,34 +11,34 @@ spec:
         requests:
           cpu: 700m
           memory: 3Gi
-      # affinity:
-      #   podAntiAffinity:
-      #     preferredDuringSchedulingIgnoredDuringExecution:
-      #     - weight: 100
-      #       podAffinityTerm:
-      #         labelSelector:
-      #           matchExpressions:
-      #           - key: "technology"
-      #             operator: In
-      #             values:
-      #             - solr-cloud
-      #           - key: "solr-cloud"
-      #             operator: In
-      #             values:
-      #             - aks-iati-solr-prod
-      #         topologyKey: topology.kubernetes.io/zone
-      #     requiredDuringSchedulingIgnoredDuringExecution:
-      #       - labelSelector:
-      #           matchExpressions:
-      #           - key: "technology"
-      #             operator: In
-      #             values:
-      #             - solr-cloud
-      #           - key: "solr-cloud"
-      #             operator: In
-      #             values:
-      #             - aks-iati-solr-prod
-      #         topologyKey: kubernetes.io/hostname
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: "technology"
+                  operator: In
+                  values:
+                  - solr-cloud
+                - key: "solr-cloud"
+                  operator: In
+                  values:
+                  - iati-prod
+              topologyKey: topology.kubernetes.io/zone
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: "technology"
+                  operator: In
+                  values:
+                  - solr-cloud
+                - key: "solr-cloud"
+                  operator: In
+                  values:
+                  - iati-prod
+              topologyKey: kubernetes.io/hostname
   dataStorage:
     persistent:
       pvcTemplate:
@@ -77,34 +77,34 @@ spec:
           requests:
             cpu: 250m
             memory: 500Mi
-        # affinity:
-        #   podAntiAffinity:
-        #     preferredDuringSchedulingIgnoredDuringExecution:
-        #     - weight: 100
-        #       podAffinityTerm:
-        #         labelSelector:
-        #           matchExpressions:
-        #           - key: "technology"
-        #             operator: In
-        #             values:
-        #             - zookeeper
-        #           - key: "solr-cloud"
-        #             operator: In
-        #             values:
-        #             - aks-iati-solr-prod
-        #         topologyKey: topology.kubernetes.io/zone
-        #     requiredDuringSchedulingIgnoredDuringExecution:
-        #       - labelSelector:
-        #           matchExpressions:
-        #           - key: "technology"
-        #             operator: In
-        #             values:
-        #             - solr-cloud
-        #           - key: "solr-cloud"
-        #             operator: In
-        #             values:
-        #             - aks-iati-solr-prod
-        #         topologyKey: kubernetes.io/hostname
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: "technology"
+                    operator: In
+                    values:
+                    - zookeeper
+                  - key: "solr-cloud"
+                    operator: In
+                    values:
+                    - iati-prod
+                topologyKey: topology.kubernetes.io/zone
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                  - key: "technology"
+                    operator: In
+                    values:
+                    - zookeeper
+                  - key: "solr-cloud"
+                    operator: In
+                    values:
+                    - iati-prod
+                topologyKey: kubernetes.io/hostname
   solrAddressability:
     commonServicePort: 443
     external:
