@@ -1,7 +1,7 @@
 apiVersion: solr.apache.org/v1beta1
 kind: SolrCloud
 metadata:
-  name: aks-iati-solr-prod
+  name: iati-prod
 spec:
   customSolrKubeOptions:
     podOptions:
@@ -11,6 +11,34 @@ spec:
         requests:
           cpu: 700m
           memory: 3Gi
+      # affinity:
+      #   podAntiAffinity:
+      #     preferredDuringSchedulingIgnoredDuringExecution:
+      #     - weight: 100
+      #       podAffinityTerm:
+      #         labelSelector:
+      #           matchExpressions:
+      #           - key: "technology"
+      #             operator: In
+      #             values:
+      #             - solr-cloud
+      #           - key: "solr-cloud"
+      #             operator: In
+      #             values:
+      #             - aks-iati-solr-prod
+      #         topologyKey: topology.kubernetes.io/zone
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       - labelSelector:
+      #           matchExpressions:
+      #           - key: "technology"
+      #             operator: In
+      #             values:
+      #             - solr-cloud
+      #           - key: "solr-cloud"
+      #             operator: In
+      #             values:
+      #             - aks-iati-solr-prod
+      #         topologyKey: kubernetes.io/hostname
   dataStorage:
     persistent:
       pvcTemplate:
@@ -28,7 +56,7 @@ spec:
     method: Managed
   zookeeperRef:
     provided:
-      chroot: /explore
+      chroot: /iatisolrprod
       image:
         pullPolicy: IfNotPresent
         repository: pravega/zookeeper
@@ -49,6 +77,34 @@ spec:
           requests:
             cpu: 250m
             memory: 500Mi
+        # affinity:
+        #   podAntiAffinity:
+        #     preferredDuringSchedulingIgnoredDuringExecution:
+        #     - weight: 100
+        #       podAffinityTerm:
+        #         labelSelector:
+        #           matchExpressions:
+        #           - key: "technology"
+        #             operator: In
+        #             values:
+        #             - zookeeper
+        #           - key: "solr-cloud"
+        #             operator: In
+        #             values:
+        #             - aks-iati-solr-prod
+        #         topologyKey: topology.kubernetes.io/zone
+        #     requiredDuringSchedulingIgnoredDuringExecution:
+        #       - labelSelector:
+        #           matchExpressions:
+        #           - key: "technology"
+        #             operator: In
+        #             values:
+        #             - solr-cloud
+        #           - key: "solr-cloud"
+        #             operator: In
+        #             values:
+        #             - aks-iati-solr-prod
+        #         topologyKey: kubernetes.io/hostname
   solrAddressability:
     commonServicePort: 443
     external:
@@ -57,7 +113,8 @@ spec:
       nodePortOverride: 443
       useExternalAddress: false
     podPort: 8983
-  solrTLS:
+  solrTLS:  
+    restartOnTLSSecretUpdate: true
     pkcs12Secret:
       name: solr-tls
       key: keystore.p12

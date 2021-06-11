@@ -140,12 +140,53 @@ kubectl get ingress
 kubectl describe ingress aks-iati-solr-prod-solrcloud-common
 
 # Get credentials for admin user
-kubectl get secret aks-iati-solr-prod-solrcloud-security-bootstrap \
+kubectl get secret iati-prod-solrcloud-security-bootstrap \
   -o jsonpath='{.data.admin}' | base64 --decode
 
 # Get credentials for solr user
 kubectl get secret aks-iati-solr-prod-solrcloud-security-bootstrap \
   -o jsonpath='{.data.solr}' | base64 --decode
+```
+
+### Monitoring
+
+Install Prometheus stack
+https://apache.github.io/solr-operator/docs/solr-prometheus-exporter/#prometheus-stack
+
+```bash
+# Check
+kubectl get pods -n monitoring
+
+```
+
+Set up SolrPrometheusExporter
+```bash
+# Apply
+kubectl apply -f prom-exporter.yml
+
+kubectl logs -f -l solr-prometheus-exporter=prom-exporter-prod
+
+kubectl port-forward $(kubectl get pod -l solr-prometheus-exporter=prom-exporter-prod --no-headers -o custom-columns=":metadata.name") 8080
+
+curl http://localhost:8080/metrics 
+```
+
+Set up service monitor
+```bash
+# Apply
+kubectl apply -f monitor.yml
+
+```
+
+Grafana Dashboards
+```bash
+# Port forward from grafana pod
+GRAFANA_POD_ID=$(kubectl get pod -l app.kubernetes.io/name=grafana --no-headers -o custom-columns=":metadata.name" -n monitoring)
+kubectl port-forward -n monitoring $GRAFANA_POD_ID 3000
+
+http://localhost:3000
+username: admin
+pw: prom-operator
 ```
 
 ## Clean up
@@ -195,3 +236,25 @@ https://lucidworks.com/post/running-solr-on-kubernetes-part-1/
 https://docs.microsoft.com/en-ca/azure/aks/ingress-basic
 
 https://solr.apache.org/operator/articles/explore-v030-gke.html
+
+## Issue
+
+### When adding Pod anti-affinity rules:
+
+❯ kubectl describe pod/aks-iati-solr-prod-solrcloud-2
+Name:           aks-iati-solr-prod-solrcloud-2
+Namespace:      default
+Priority:       0
+Node:           <none>
+Labels:         controller-revision-hash=aks-iati-solr-prod-solrcloud-698857d5d
+                solr-cloud=aks-iati-solr-prod
+                statefulset.kubernetes.io/pod-name=aks-iati-solr-prod-solrcloud-2
+                technology=solr-cloud
+Annotations:    solr.apache.org/solrXmlMd5: d5762e93617f75e208ecbbca00c079c6
+Status:         Pending
+
+Events:
+  Type     Reason            Age                     From               Message
+  ----     ------            ----                    ----               -------
+  Warning  FailedScheduling  3m26s (x10 over 4m45s)  default-scheduler  0/3 nodes are available: 1 node(s) didn't match pod affinity/anti-affinity, 1 node(s) didn't satisfy existing pods anti-affinity rules, 2 Insufficient memory.
+  Warning  FailedScheduling  44s (x3 over 3m15s)     default-scheduler  0/3 nodes are available: 3 Insufficient memory.

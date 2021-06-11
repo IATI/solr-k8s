@@ -1,0 +1,29 @@
+apiVersion: solr.apache.org/v1beta1
+kind: SolrPrometheusExporter
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: prom-exporter-prod
+spec:
+  customKubeOptions:
+    podOptions:
+      resources:
+        requests:
+          cpu: 300m
+          memory: 900Mi
+  solrReference:
+    cloud:
+      name: iati-prod
+    basicAuthSecret: iati-prod-solrcloud-basic-auth
+    solrTLS:
+      restartOnTLSSecretUpdate: true
+      pkcs12Secret:
+        name: solr-tls
+        key: keystore.p12
+      keyStorePasswordSecret:
+        name: pkcs12-keystore-password
+        key: password-key
+  numThreads: 6
+  image:
+    repository: solr
+    tag: 8.8.2
