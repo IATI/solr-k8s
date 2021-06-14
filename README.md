@@ -16,9 +16,10 @@ az aks create \
     --resource-group $RG \
     --name aks-solr-PROD \
     --generate-ssh-keys \
+    --node-vm-size "Standard_E2as_v4" \
     --vm-set-type VirtualMachineScaleSets \
     --load-balancer-sku standard \
-    --node-count 4 \
+    --node-count 3 \
     --zones 1 2 3
 
 # Get context of your cluster and set that as your kubectl context
@@ -196,13 +197,19 @@ Grafana Dashboards
 # Port forward from grafana pod
 GRAFANA_POD_ID=$(kubectl get pod -l app.kubernetes.io/name=grafana --no-headers -o custom-columns=":metadata.name" -n monitoring)
 kubectl port-forward -n monitoring $GRAFANA_POD_ID 3000
+```
 
 http://localhost:3000
 username: admin
 pw: prom-operator
-```
+
+Import Dashboard id: `12456`
+Data source: Prometheus
 
 ## Clean up
+
+## Entire RG
+`az group delete --name rg-solr-PROD --yes --no-wait`
 
 ### Pods
 
@@ -233,11 +240,12 @@ pw: prom-operator
 - Performance Monitoring
   - [x] Prometheus/Grafana
 - Backups
-- [ ] Sizing
-  - Currently on "vmSize": "Standard_DS2_v2"
-  - Needed 4 Nodes (VMs) to support 3 Solr Nodes, 3 Zookeeper, + Monitoring suite. Potentially use 3 Nodes w/ more memory, same price?
+- [X] Sizing
+  - Currently on "Standard_E2as_v4" (RAM Optimised) 16 GB RAM x 3 nodes  = ~$324/mo
 - CI/CD
   - Can (or should) I GitHub Actions this?
+- APIM Integration
+  - https://docs.microsoft.com/en-us/azure/api-management/api-management-kubernetes?toc=https%3A%2F%2Fdocs.microsoft.com%2Fen-us%2Fazure%2Faks%2Ftoc.json&bc=https%3A%2F%2Fdocs.microsoft.com%2Fen-us%2Fazure%2Fbread%2Ftoc.json
 
 ## Tips
 
