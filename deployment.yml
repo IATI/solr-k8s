@@ -11,6 +11,32 @@ spec:
         requests:
           cpu: 700m
           memory: 3Gi
+      initContainers:
+        - name: set-zone
+          image: roffe/kubectl
+          command:
+          - '/bin/sh'
+          - '-c'
+          - |
+            zone=$(kubectl get node $NODE_NAME -o jsonpath='{.metadata.labels.topology\.kubernetes\.io/zone}')
+            if [ "${zone}" != "" ]; then
+                echo "export SOLR_OPTS=\"\${SOLR_OPTS} -Davailability_zone=${zone}\"" > /docker-entrypoint-initdb.d/set-zone.sh
+            fi
+          env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          volumeMounts:
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - defaultContainerMount:
+          mountPath: /docker-entrypoint-initdb.d
+          name: initdb
+        name: initdb
+        source:
+          emptyDir: {}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

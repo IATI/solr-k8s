@@ -241,7 +241,8 @@ kubectl apply -f dashboard-ingress.yml
   - [x] Azure Availability Zones - https://docs.microsoft.com/en-ca/azure/aks/availability-zones
   - [ ] Solr Level HA
       - [x] Pod Affinity/AntiAffinity Rules
-      - [ ] Zone aware replica placement
+      - [ ] Zone aware replica placement 
+          - `-Davailability_zone=uksouth-2` is now set on pods, need to use this now! https://solr.apache.org/operator/articles/explore-v030-gke.html
 - Performance Monitoring
   - [x] Prometheus/Grafana
   - [x] Allow internet access to Dashboard
