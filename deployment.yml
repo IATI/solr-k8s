@@ -53,6 +53,9 @@ spec:
     tag: 8.8.2
   solrJavaMem: -Xms500M -Xmx500M
   updateStrategy:
+    managed:
+      maxPodsUnavailable: 1
+      maxShardReplicasUnavailable: 1
     method: Managed
   zookeeperRef:
     provided:
