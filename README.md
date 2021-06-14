@@ -201,10 +201,15 @@ kubectl port-forward -n monitoring $GRAFANA_POD_ID 3000
 
 http://localhost:3000
 username: admin
-pw: prom-operator
+initial pw: prom-operator
 
 Import Dashboard id: `12456`
 Data source: Prometheus
+
+```bash
+# Add ingress rule to allow dashboard access at dashboard.solr.iatistandard.org
+kubectl apply -f dashboard-ingress.yml
+``` 
 
 ## Clean up
 
@@ -239,6 +244,7 @@ Data source: Prometheus
       - [ ] Zone aware replica placement
 - Performance Monitoring
   - [x] Prometheus/Grafana
+  - [x] Allow internet access to Dashboard
 - Backups
 - [X] Sizing
   - Currently on "Standard_E2as_v4" (RAM Optimised) 16 GB RAM x 3 nodes  = ~$324/mo
@@ -246,6 +252,7 @@ Data source: Prometheus
   - Can (or should) I GitHub Actions this?
 - APIM Integration
   - https://docs.microsoft.com/en-us/azure/api-management/api-management-kubernetes?toc=https%3A%2F%2Fdocs.microsoft.com%2Fen-us%2Fazure%2Faks%2Ftoc.json&bc=https%3A%2F%2Fdocs.microsoft.com%2Fen-us%2Fazure%2Fbread%2Ftoc.json
+  - [X] - routing from APIM to public domain name. APIM does basic auth to Solr with a policy.
 
 ## Tips
 
@@ -263,3 +270,5 @@ https://lucidworks.com/post/running-solr-on-kubernetes-part-1/
 https://docs.microsoft.com/en-ca/azure/aks/ingress-basic
 
 https://solr.apache.org/operator/articles/explore-v030-gke.html
+
+https://www.searchstax.com/docs/hc/how-many-solr-servers/

@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dashboard-ingress
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+  - hosts:
+    - dashboard.solr.iatistandard.org
+    secretName: tls-secret
+  rules:
+  - host: dashboard.solr.iatistandard.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mon-grafana
+            port:
+              number: 80
