@@ -140,11 +140,11 @@ kubectl get solrclouds -w
 kubectl get ingress
 kubectl describe ingress aks-iati-solr-prod-solrcloud-common
 
-# Get credentials for admin user
+# Get initial credentials for admin user, if password is changed using admin API, the secret is NOT updated.
 kubectl get secret iati-prod-solrcloud-security-bootstrap \
   -o jsonpath='{.data.admin}' | base64 --decode
 
-# Get credentials for solr user
+# Get credentials for solr user, if password is changed using admin API, the secret is NOT updated.
 kubectl get secret aks-iati-solr-prod-solrcloud-security-bootstrap \
   -o jsonpath='{.data.solr}' | base64 --decode
 ```
