@@ -210,6 +210,11 @@ Data source: Prometheus
 # Add ingress rule to allow dashboard access at dashboard.solr.iatistandard.org
 kubectl apply -f dashboard-ingress.yml
 ``` 
+## Logs
+Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Solr. Otherwise the errors are about syncing between the replicas and not the root error.
+```bash
+kubectl logs iati-prod-solrcloud-1 | grep -A 5 SolrException > logs.txt
+```
 
 ## Clean up
 
