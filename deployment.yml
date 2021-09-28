@@ -76,7 +76,7 @@ spec:
   replicas: 3
   solrImage:
     repository: solr
-    tag: 8.8.2
+    tag: 8.9.0
   solrJavaMem: -Xms500M -Xmx500M
   updateStrategy:
     managed:
