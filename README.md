@@ -11,7 +11,7 @@ Repo containing kubernetes deployment information for IATI Solr Production insta
 az group create --resource-group rg-solr-PROD --location uksouth
 RG=rg-solr-PROD
 
-# Creating AKS Cluster with 4 nodes across availability zones
+# Creating AKS Cluster with 3 nodes across availability zones
 az aks create \
     --resource-group $RG \
     --name aks-solr-PROD \
@@ -109,6 +109,20 @@ kubectl describe certificaterequests tls-secret-XXXX
 kubectl describe order tls-secret-XXXX-YYYYYYYYY
 
 ```
+
+### Renewing Certificates
+
+`cert-manager` will auto renew certificates and save them into the Kubernetes secrets/keystore. 
+The Solr pods won't pick up the new certificate until it's restarted. 
+The below setting should force this restart, however if one of the Solr nodes is in a degraded state it may not allow a restart. 
+So after leaving things for 3mo I had to delete pods to force a restart. 
+
+```yml
+solrTLS:  
+    restartOnTLSSecretUpdate: true
+```
+
+https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#certificate-renewal-and-rolling-restarts
 
 ### Solr Cloud
 
@@ -216,6 +230,28 @@ Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Sol
 ```bash
 kubectl logs iati-prod-solrcloud-1 | grep -A 5 SolrException > logs.txt
 ```
+## Maintenance Commands
+
+Restart Stateful Set
+`kubectl rollout restart statefulset iati-prod-solrcloud`
+
+Delete a pod to force restart
+`kubectl delete pod <pod>`
+
+## Upgrading Solr
+
+Update tag to version in `deployment.yml`:
+```yml
+solrImage:
+    repository: solr
+    tag: 8.9.0
+```
+
+Apply:
+`kubectl apply -f deployment.yml`
+
+### Notes
+- Upgrading from 8.8.2 to 8.9.0 took approximately ~4hrs. Recommended to take a downtime for this by Solr docs.
 
 ## Clean up
 
