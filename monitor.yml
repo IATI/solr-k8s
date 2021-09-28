@@ -13,4 +13,4 @@ spec:
       - default
   endpoints:
     - port: solr-metrics
-      interval: 15s
+      interval: 20s

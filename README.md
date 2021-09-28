@@ -231,9 +231,18 @@ Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Sol
 kubectl logs iati-prod-solrcloud-1 | grep -A 5 SolrException > logs.txt
 ```
 ## Maintenance Commands
+https://apache.github.io/solr-operator/docs/solr-cloud/managed-updates.html
 
-Restart Stateful Set
+Logs of Solr Operator (shows Manage)
+`kubectl logs solr-operator-*`
+`kubectl logs solr-operator-6d4648fc56-zms94 --since=5m | grep ManagedUpdateSelector`
+
+Restart Stateful Set (not 100% if this should be used given above)
 `kubectl rollout restart statefulset iati-prod-solrcloud`
+`kubectl rollout restart statefulset iati-prod-solrcloud-zookeeper`
+
+Status of Stateful Set restart
+`kubectl rollout status statefulset <name>`
 
 Delete a pod to force restart
 `kubectl delete pod <pod>`
@@ -247,18 +256,58 @@ solrImage:
     tag: 8.9.0
 ```
 
+Update tag to version in `prom-exporter.yml`
+```yml
+image:
+    repository: solr
+    tag: 8.9.0
+```
+
 Apply:
 `kubectl apply -f deployment.yml`
 
 ### Notes
 - Upgrading from 8.8.2 to 8.9.0 took approximately ~4hrs. Recommended to take a downtime for this by Solr docs.
 
+## Upgrade Solr Operator Helm Chart
+https://artifacthub.io/packages/helm/apache-solr/solr-operator#upgrading-the-solr-operator
+
+```
+> kubectl replace -f https://solr.apache.org/operator/downloads/crds/v0.4.0/all-with-dependencies.yaml
+
+customresourcedefinition.apiextensions.k8s.io/solrbackups.solr.apache.org replaced
+customresourcedefinition.apiextensions.k8s.io/solrclouds.solr.apache.org replaced
+customresourcedefinition.apiextensions.k8s.io/solrprometheusexporters.solr.apache.org replaced
+customresourcedefinition.apiextensions.k8s.io/zookeeperclusters.zookeeper.pravega.io replaced
+
+> helm repo update
+> helm upgrade solr-operator apache-solr/solr-operator --version 0.4.0
+
+Release "solr-operator" has been upgraded. Happy Helming!
+NAME: solr-operator
+LAST DEPLOYED: Tue Sep 28 15:48:25 2021
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NOTES:
+Solr-Operator successfully installed!
+```
+
+### Notes
+- v0.3.0 -> v0.4.0 
+  - kicked off rolling restart of Solr and Zookeeper pods
+
+## Helm
+Show installed charts information
+`helm list --namespace <namespace:default>`
+
 ## Clean up
 
-## Entire RG
+## DELETE Entire RG
 `az group delete --name rg-solr-PROD --yes --no-wait`
 
-### Pods
+### Pods from a config
 
 `kubectl delete -f <file.yml>`
 
