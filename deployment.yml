@@ -4,6 +4,9 @@ metadata:
   name: iati-prod
 spec:
   customSolrKubeOptions:
+    ingressOptions:
+      annotations:
+        kubernetes.io/ingress.class: nginx
     podOptions:
       resources:
         limits:

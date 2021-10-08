@@ -56,6 +56,7 @@ helm install nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.service.loadBalancerIP="$IP_ADDRESS" \
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-prod" \
     --set-string controller.config.proxy-body-size="60m"
+    --set-string controller.config.large-client-header-buffers="4 128k"
 
 # Check 
 kubectl get pods -l app.kubernetes.io/name=ingress-nginx \
@@ -65,6 +66,21 @@ kubectl get services -o wide -w nginx-ingress-ingress-nginx-controller
 
 az network public-ip list --resource-group $POD_RG --query "[?name=='pip-solr-PROD'].[dnsSettings.fqdn]" -o tsv
 # aks-solr-prod.uksouth.cloudapp.azure.com
+```
+
+### Upgrade / Config Change NGINX
+
+```zsh
+helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
+    --set controller.replicaCount=2 \
+    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
+    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
+    --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux \
+    --set controller.service.loadBalancerIP="$IP_ADDRESS" \
+    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-prod" \
+    --set-string controller.config.proxy-body-size="60m" \
+    --set-string controller.config.large-client-header-buffers="4 512K" \
+    --set-string controller.config.client-header-buffer-size="512K"
 ```
 
 ### Certificate Generation
@@ -153,7 +169,7 @@ kubectl get solrclouds -w
 
 # check ingress config for URL
 kubectl get ingress
-kubectl describe ingress aks-iati-solr-prod-solrcloud-common
+kubectl describe ingress iati-prod-solrcloud-common
 
 # Get initial credentials for admin user, if password is changed using admin API, the secret is NOT updated.
 kubectl get secret iati-prod-solrcloud-security-bootstrap \
