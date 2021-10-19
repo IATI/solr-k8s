@@ -86,6 +86,7 @@ spec:
       maxPodsUnavailable: 1
       maxShardReplicasUnavailable: 1
     method: Managed
+    restartSchedule: "@hourly"
   zookeeperRef:
     provided:
       chroot: /iatisolrprod
