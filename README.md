@@ -7,7 +7,7 @@ Repo containing kubernetes deployment information for IATI Solr Production insta
 ### Initial Setup / kubectl Context
 
 ```bash
-# Create resrouce group
+# Create resource group
 az group create --resource-group rg-solr-PROD --location uksouth
 RG=rg-solr-PROD
 
@@ -246,6 +246,7 @@ Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Sol
 ```bash
 kubectl logs iati-prod-solrcloud-1 | grep -A 5 SolrException > logs.txt
 ```
+
 ## Maintenance Commands
 https://apache.github.io/solr-operator/docs/solr-cloud/managed-updates.html
 
@@ -253,15 +254,9 @@ Logs of Solr Operator (shows Manage)
 `kubectl logs solr-operator-*`
 `kubectl logs solr-operator-6d4648fc56-zms94 --since=5m | grep ManagedUpdateSelector`
 
-Restart Stateful Set (not 100% if this should be used given above)
-`kubectl rollout restart statefulset iati-prod-solrcloud`
-`kubectl rollout restart statefulset iati-prod-solrcloud-zookeeper`
+### Restarts
 
-Status of Stateful Set restart
-`kubectl rollout status statefulset <name>`
-
-Delete a pod to force restart
-`kubectl delete pod <pod>`
+See https://github.com/IATI/IATI-Internal-Wiki/blob/main/IATI-Unified-Infra/Solr.md
 
 ## Upgrading Solr
 
