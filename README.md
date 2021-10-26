@@ -55,7 +55,7 @@ helm install nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set controller.service.loadBalancerIP="$IP_ADDRESS" \
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-prod" \
-    --set-string controller.config.proxy-body-size="60m"
+    --set-string controller.config.proxy-body-size="100m"
     --set-string controller.config.large-client-header-buffers="4 128k"
 
 # Check 
@@ -78,7 +78,7 @@ helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set controller.service.loadBalancerIP="$IP_ADDRESS" \
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-prod" \
-    --set-string controller.config.proxy-body-size="60m" \
+    --set-string controller.config.proxy-body-size="100m" \
     --set-string controller.config.large-client-header-buffers="4 512K" \
     --set-string controller.config.client-header-buffer-size="512K"
 ```
