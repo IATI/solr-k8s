@@ -175,10 +175,8 @@ kubectl describe ingress iati-prod-solrcloud-common
 kubectl get secret iati-prod-solrcloud-security-bootstrap \
   -o jsonpath='{.data.admin}' | base64 --decode
 
-# Get credentials for solr user, if password is changed using admin API, the secret is NOT updated.
-kubectl get secret aks-iati-solr-prod-solrcloud-security-bootstrap \
-  -o jsonpath='{.data.solr}' | base64 --decode
-```
+# Solr Read only user pw
+kubectl get secret iati-prod-solrcloud-security-bootstrap -o jsonpath='{.data.solr}' | base64 --decode
 
 ### HA
 
@@ -264,14 +262,7 @@ Update tag to version in `deployment.yml`:
 ```yml
 solrImage:
     repository: solr
-    tag: 8.9.0
-```
-
-Update tag to version in `prom-exporter.yml`
-```yml
-image:
-    repository: solr
-    tag: 8.9.0
+    tag: 8.10.0
 ```
 
 Apply:

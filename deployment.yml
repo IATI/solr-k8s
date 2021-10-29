@@ -76,12 +76,12 @@ spec:
         spec:
           resources:
             requests:
-              storage: 50Gi
+              storage: 256Gi
       reclaimPolicy: Delete
   replicas: 3
   solrImage:
     repository: solr
-    tag: 8.9.0
+    tag: 8.10.0
   solrJavaMem: -Xms500M -Xmx500M
   updateStrategy:
     managed:
@@ -103,7 +103,7 @@ spec:
           - ReadWriteOnce
           resources:
             requests:
-              storage: 20Gi
+              storage: 1Gi
       replicas: 3
       zookeeperPodPolicy:
         resources:
