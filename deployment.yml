@@ -82,7 +82,7 @@ spec:
   solrImage:
     repository: solr
     tag: 8.10.0
-  solrJavaMem: -Xms500M -Xmx500M
+  solrJavaMem: -Xms3g -Xmx3g
   updateStrategy:
     managed:
       maxPodsUnavailable: 1
