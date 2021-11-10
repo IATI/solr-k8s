@@ -44,20 +44,6 @@ spec:
           emptyDir: {}
       affinity:
         podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: "technology"
-                  operator: In
-                  values:
-                  - solr-cloud
-                - key: "solr-cloud"
-                  operator: In
-                  values:
-                  - iati-prod
-              topologyKey: topology.kubernetes.io/zone
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchExpressions:
@@ -114,20 +100,6 @@ spec:
             memory: 1Gi
         affinity:
           podAntiAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                  - key: "technology"
-                    operator: In
-                    values:
-                    - zookeeper
-                  - key: "solr-cloud"
-                    operator: In
-                    values:
-                    - iati-prod
-                topologyKey: topology.kubernetes.io/zone
             requiredDuringSchedulingIgnoredDuringExecution:
               - labelSelector:
                   matchExpressions:
