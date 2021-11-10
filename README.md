@@ -48,7 +48,7 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
-helm install nginx-ingress ingress-nginx/ingress-nginx \
+helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.replicaCount=2 \
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
@@ -82,6 +82,26 @@ helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
     --set-string controller.config.large-client-header-buffers="4 512K" \
     --set-string controller.config.client-header-buffer-size="512K"
 ```
+
+### Secrets
+
+https://github.com/bitnami-labs/sealed-secrets#installation
+
+#### Install Sealed Secrets
+```bash
+kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.16.0/controller.yaml
+```
+
+#### Install kubeseal
+- Follow above link
+
+### Create a sealed secret
+
+```bash
+kubeseal -o yaml < my-secret.yaml > my-secret-sealed.yaml
+kubectl apply -f my-secret-sealed.yaml
+```
+Commit my-secret-sealed.yaml into git with no worries. Delete my-secret.yaml
 
 ### Certificate Generation
 
@@ -175,7 +195,7 @@ kubectl describe ingress iati-prod-solrcloud-common
 kubectl get secret iati-prod-solrcloud-security-bootstrap \
   -o jsonpath='{.data.admin}' | base64 --decode
 
-# Solr Read only user pw
+# Solr user pw
 kubectl get secret iati-prod-solrcloud-security-bootstrap -o jsonpath='{.data.solr}' | base64 --decode
 
 ### HA
@@ -339,7 +359,7 @@ Show installed charts information
 - Performance Monitoring
   - [x] Prometheus/Grafana
   - [x] Allow internet access to Dashboard
-- Backups
+- [ ] Backups
 - [X] Sizing
   - Currently on "Standard_E2as_v4" (RAM Optimised) 16 GB RAM x 3 nodes  = ~$324/mo
 - CI/CD
