@@ -119,10 +119,10 @@ helm install cert-manager jetstack/cert-manager \
 
 ```bash
 # Create certificate ClusterIssuer
-kubectl apply -f cert-issuer.yml
+kubectl apply -f infrastructure/certificates/cert-issuer.yml
 
 # Issue certificate
-kubectl apply -f certificate.yml
+kubectl apply -f infrastructure/certificates/certificate.yml
 
 # Check Progress
 kubectl get certificates
@@ -170,9 +170,9 @@ helm repo add apache-solr https://solr.apache.org/charts
 helm repo update
 
 # Install helm chart and then solr-operator
-kubectl create -f https://solr.apache.org/operator/downloads/crds/v0.3.0/all-with-dependencies.yaml
+kubectl create -f https://solr.apache.org/operator/downloads/crds/v0.4.0/all-with-dependencies.yaml
 helm upgrade --install solr-operator apache-solr/solr-operator \
-  --version 0.3.0
+  --version 0.4.0
 
 # Check on whats running
 kubectl get pod -l control-plane=solr-operator
@@ -182,7 +182,7 @@ kubectl describe pod -l control-plane=solr-operator
 kubectl get pod -l component=zookeeper-operator
 
 # Deploy
-kubectl apply -f deployment.yml
+kubectl apply -f solr/deployment.yml
 
 # watch nodes come up
 kubectl get solrclouds -w
@@ -225,7 +225,7 @@ kubectl get pods -n monitoring
 Set up SolrPrometheusExporter
 ```bash
 # Apply
-kubectl apply -f prom-exporter.yml
+kubectl apply -f monitoring/prom-exporter.yml
 
 kubectl logs -f -l solr-prometheus-exporter=prom-exporter-prod
 
@@ -237,7 +237,7 @@ curl http://localhost:8080/metrics
 Set up service monitor
 ```bash
 # Apply
-kubectl apply -f monitor.yml
+kubectl apply -f monitoring/monitor.yml
 
 ```
 
@@ -257,7 +257,7 @@ Data source: Prometheus
 
 ```bash
 # Add ingress rule to allow dashboard access at dashboard.solr.iatistandard.org
-kubectl apply -f dashboard-ingress.yml
+kubectl apply -f infrastructure/ingress/dashboard-ingress.yml
 ``` 
 ## Logs
 Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Solr. Otherwise the errors are about syncing between the replicas and not the root error.
@@ -286,7 +286,7 @@ solrImage:
 ```
 
 Apply:
-`kubectl apply -f deployment.yml`
+`kubectl apply -f solr/deployment.yml`
 
 ### Notes
 - Upgrading from 8.8.2 to 8.9.0 took approximately ~4hrs. Recommended to take a downtime for this by Solr docs.
@@ -319,6 +319,7 @@ Solr-Operator successfully installed!
 ### Notes
 - v0.3.0 -> v0.4.0 
   - kicked off rolling restart of Solr and Zookeeper pods
+  - Took a few hours
 
 ## Helm
 Show installed charts information
