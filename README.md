@@ -342,33 +342,6 @@ Show installed charts information
 `helm uninstall solr-operator`
 `helm uninstall cert-manager`
 
-## TODO
-
-- Networking
-  - [X] Static IP - https://docs.microsoft.com/en-ca/azure/aks/ingress-static-ip
-  - [x] Ingress
-  - [x] TLS - staging cert
-  - [x] TLS - prod cert
-- Auth
-  - [x] Basic Auth - https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#authentication-and-authorization
-- High Availability
-  - [x] Azure Availability Zones - https://docs.microsoft.com/en-ca/azure/aks/availability-zones
-  - [ ] Solr Level HA
-      - [x] Pod Affinity/AntiAffinity Rules
-      - [ ] Zone aware replica placement 
-          - `-Davailability_zone=uksouth-2` is now set on pods, need to use this now! https://solr.apache.org/operator/articles/explore-v030-gke.html
-- Performance Monitoring
-  - [x] Prometheus/Grafana
-  - [x] Allow internet access to Dashboard
-- [ ] Backups
-- [X] Sizing
-  - Currently on "Standard_E2as_v4" (RAM Optimised) 16 GB RAM x 3 nodes  = ~$324/mo
-- CI/CD
-  - Can (or should) I GitHub Actions this?
-- APIM Integration
-  - https://docs.microsoft.com/en-us/azure/api-management/api-management-kubernetes?toc=https%3A%2F%2Fdocs.microsoft.com%2Fen-us%2Fazure%2Faks%2Ftoc.json&bc=https%3A%2F%2Fdocs.microsoft.com%2Fen-us%2Fazure%2Fbread%2Ftoc.json
-  - [X] - routing from APIM to public domain name. APIM does basic auth to Solr with a policy.
-
 ## Tips
 
 Connecting to container locally using kubectl context:
