@@ -3,7 +3,7 @@ kind: SolrPrometheusExporter
 metadata:
   labels:
     controller-tools.k8s.io: "1.0"
-  name: prom-exporter-prod
+  name: prom-exporter-dev
 spec:
   customKubeOptions:
     podOptions:
@@ -13,14 +13,14 @@ spec:
           memory: 900Mi
   solrReference:
     cloud:
-      name: iati-prod
-    basicAuthSecret: iati-prod-solrcloud-basic-auth
+      name: iati-dev
+    basicAuthSecret: iati-dev-solrcloud-basic-auth
     solrTLS:
       restartOnTLSSecretUpdate: true
       pkcs12Secret:
         name: solr-tls
         key: keystore.p12
       keyStorePasswordSecret:
-        name: pkcs12-keystore-password
+        name: pkcs12-keystore-password-dev
         key: password-key
   numThreads: 6

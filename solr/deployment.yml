@@ -1,7 +1,7 @@
 apiVersion: solr.apache.org/v1beta1
 kind: SolrCloud
 metadata:
-  name: iati-prod
+  name: iati-dev
 spec:
   customSolrKubeOptions:
     ingressOptions:
@@ -12,10 +12,10 @@ spec:
         manualrestart: "2021-10-25T08:07:00Z"
       resources:
         limits:
-          memory: 9Gi
+          memory: 8Gi
         requests:
-          cpu: 700m
-          memory: 9Gi
+          cpu: 500m
+          memory: 8Gi
       initContainers:
         - name: set-zone
           image: roffe/kubectl
@@ -54,7 +54,7 @@ spec:
                 - key: "solr-cloud"
                   operator: In
                   values:
-                  - iati-prod
+                  - iati-dev
               topologyKey: kubernetes.io/hostname
   dataStorage:
     persistent:
@@ -62,12 +62,12 @@ spec:
         spec:
           resources:
             requests:
-              storage: 256Gi
+              storage: 64Gi
       reclaimPolicy: Delete
-  replicas: 3
+  replicas: 1
   solrImage:
     repository: solr
-    tag: 8.10.0
+    tag: 8.10.1
   solrJavaMem: -Xms3g -Xmx3g
   updateStrategy:
     managed:
@@ -77,7 +77,7 @@ spec:
     restartSchedule: "0 7 * * *"
   zookeeperRef:
     provided:
-      chroot: /iatisolrprod
+      chroot: /iatisolrdev
       image:
         pullPolicy: IfNotPresent
         repository: pravega/zookeeper
@@ -90,14 +90,14 @@ spec:
           resources:
             requests:
               storage: 1Gi
-      replicas: 3
+      replicas: 1
       zookeeperPodPolicy:
         resources:
           limits:
-            memory: 1Gi
+            memory: 500Mi
           requests:
             cpu: 250m
-            memory: 1Gi
+            memory: 500Mi
         affinity:
           podAntiAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
@@ -110,12 +110,12 @@ spec:
                   - key: "solr-cloud"
                     operator: In
                     values:
-                    - iati-prod
+                    - iati-dev
                 topologyKey: kubernetes.io/hostname
   solrAddressability:
     commonServicePort: 443
     external:
-      domainName: solr.iatistandard.org
+      domainName: solr-dev.iatistandard.org
       method: Ingress
       nodePortOverride: 443
       useExternalAddress: false
@@ -126,7 +126,7 @@ spec:
       name: solr-tls
       key: keystore.p12
     keyStorePasswordSecret:
-      name: pkcs12-keystore-password
+      name: pkcs12-keystore-password-dev
       key: password-key
   solrSecurity:
     authenticationType: Basic

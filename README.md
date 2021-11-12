@@ -7,23 +7,25 @@ Repo containing kubernetes deployment information for IATI Solr Production insta
 ### Initial Setup / kubectl Context
 
 ```bash
-# Create resource group
-az group create --resource-group rg-solr-PROD --location uksouth
-RG=rg-solr-PROD
+# Set ENV
+ENV=dev
 
-# Creating AKS Cluster with 3 nodes across availability zones
+# Create resource group
+az group create --resource-group rg-solr-$ENV --location uksouth
+RG=rg-solr-$ENV
+
+# Creating AKS Cluster with 1 node (dev sized)
 az aks create \
     --resource-group $RG \
-    --name aks-solr-PROD \
+    --name aks-solr-$ENV \
     --generate-ssh-keys \
     --node-vm-size "Standard_E2as_v4" \
     --vm-set-type VirtualMachineScaleSets \
     --load-balancer-sku standard \
-    --node-count 3 \
-    --zones 1 2 3
+    --node-count 1
 
 # Get context of your cluster and set that as your kubectl context
-az aks get-credentials --resource-group $RG --name aks-solr-PROD
+az aks get-credentials --resource-group $RG --name aks-solr-$ENV
 
 # list nodes in cluster and zones
 kubectl get nodes -o custom-columns=NAME:'{.metadata.name}',REGION:'{.metadata.labels.topology\.kubernetes\.io/region}',ZONE:'{metadata.labels.topology\.kubernetes\.io/zone}'
@@ -40,8 +42,8 @@ https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough
 
 ```bash
 # Create Public IP in Azure
-POD_RG=$(az aks show --resource-group $RG --name aks-solr-PROD --query nodeResourceGroup -o tsv)
-IP_ADDRESS=$(az network public-ip create --resource-group $POD_RG --name pip-solr-PROD --sku Standard --allocation-method static --query publicIp.ipAddress -o tsv)
+POD_RG=$(az aks show --resource-group $RG --name aks-solr-$ENV --query nodeResourceGroup -o tsv)
+IP_ADDRESS=$(az network public-ip create --resource-group $POD_RG --name pip-solr-$ENV --sku Standard --allocation-method static --query publicIp.ipAddress -o tsv)
 
 # Add the ingress-nginx repository
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -49,13 +51,13 @@ helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-    --set controller.replicaCount=2 \
+    --set controller.replicaCount=1 \
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set controller.service.loadBalancerIP="$IP_ADDRESS" \
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-prod" \
-    --set-string controller.config.proxy-body-size="0"
+    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-$ENV" \
+    --set-string controller.config.proxy-body-size="0" \
     --set-string controller.config.large-client-header-buffers="4 128k"
 
 # Check 
@@ -64,7 +66,7 @@ kubectl get pods -l app.kubernetes.io/name=ingress-nginx \
 
 kubectl get services -o wide -w nginx-ingress-ingress-nginx-controller
 
-az network public-ip list --resource-group $POD_RG --query "[?name=='pip-solr-PROD'].[dnsSettings.fqdn]" -o tsv
+az network public-ip list --resource-group $POD_RG --query "[?name=='pip-solr-$ENV'].[dnsSettings.fqdn]" -o tsv
 # aks-solr-prod.uksouth.cloudapp.azure.com
 ```
 
@@ -72,15 +74,15 @@ az network public-ip list --resource-group $POD_RG --query "[?name=='pip-solr-PR
 
 ```zsh
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-    --set controller.replicaCount=2 \
+    --set controller.replicaCount=1 \
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set controller.service.loadBalancerIP="$IP_ADDRESS" \
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-prod" \
+    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-$ENV" \
     --set-string controller.config.proxy-body-size="0" \
-    --set-string controller.config.large-client-header-buffers="4 512K" \
-    --set-string controller.config.client-header-buffer-size="512K"
+    --set-string controller.config.large-client-header-buffers="4 128k"
+    # ADD MORE
 ```
 
 ### Secrets
@@ -119,9 +121,11 @@ helm install cert-manager jetstack/cert-manager \
 
 ```bash
 # Create certificate ClusterIssuer
+kubectl apply -f infrastructure/certificates/secrets/cloudflare-api-token-sealed.yaml # api token secret, needs to be re-created per cluster
 kubectl apply -f infrastructure/certificates/cert-issuer.yml
 
 # Issue certificate
+kubectl apply -f infrastructure/certificates/secrets/pkcs12-keystore-password-dev-sealed.yaml # password, needs to be re-created per cluster
 kubectl apply -f infrastructure/certificates/certificate.yml
 
 # Check Progress
@@ -181,6 +185,9 @@ kubectl describe pod -l control-plane=solr-operator
 # Verify zookeeper
 kubectl get pod -l component=zookeeper-operator
 
+# Create service permissions for zone setting on node
+k apply -f infrastructure/auth/service-account.yml
+
 # Deploy
 kubectl apply -f solr/deployment.yml
 
@@ -189,14 +196,14 @@ kubectl get solrclouds -w
 
 # check ingress config for URL
 kubectl get ingress
-kubectl describe ingress iati-prod-solrcloud-common
+kubectl describe ingress iati-$ENV-solrcloud-common
 
 # Get initial credentials for admin user, if password is changed using admin API, the secret is NOT updated.
-kubectl get secret iati-prod-solrcloud-security-bootstrap \
+kubectl get secret iati-$ENV-solrcloud-security-bootstrap \
   -o jsonpath='{.data.admin}' | base64 --decode
 
 # Solr user pw
-kubectl get secret iati-prod-solrcloud-security-bootstrap -o jsonpath='{.data.solr}' | base64 --decode
+kubectl get secret iati-$ENV-solrcloud-security-bootstrap -o jsonpath='{.data.solr}' | base64 --decode
 
 ### HA
 
@@ -227,9 +234,9 @@ Set up SolrPrometheusExporter
 # Apply
 kubectl apply -f monitoring/prom-exporter.yml
 
-kubectl logs -f -l solr-prometheus-exporter=prom-exporter-prod
+kubectl logs -f -l solr-prometheus-exporter=prom-exporter-$ENV
 
-kubectl port-forward $(kubectl get pod -l solr-prometheus-exporter=prom-exporter-prod --no-headers -o custom-columns=":metadata.name") 8080
+kubectl port-forward $(kubectl get pod -l solr-prometheus-exporter=prom-exporter-$ENV --no-headers -o custom-columns=":metadata.name") 8080
 
 curl http://localhost:8080/metrics 
 ```
@@ -262,7 +269,7 @@ kubectl apply -f infrastructure/ingress/dashboard-ingress.yml
 ## Logs
 Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Solr. Otherwise the errors are about syncing between the replicas and not the root error.
 ```bash
-kubectl logs iati-prod-solrcloud-1 | grep -A 5 SolrException > logs.txt
+kubectl logs iati-prod-solrcloud-0 | grep -A 5 SolrException > logs.txt
 ```
 
 ## Maintenance Commands
