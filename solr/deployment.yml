@@ -9,7 +9,7 @@ spec:
         kubernetes.io/ingress.class: nginx
     podOptions:
       annotations:
-        manualrestart: "2021-10-25T08:07:00Z"
+        manualrestart: "2021-11-22T11:11:00Z"
       resources:
         limits:
           memory: 9Gi
