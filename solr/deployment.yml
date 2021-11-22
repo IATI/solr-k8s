@@ -92,6 +92,8 @@ spec:
               storage: 1Gi
       replicas: 1
       zookeeperPodPolicy:
+        annotations:
+          manualrestart: "2021-11-22T14:48:00Z"
         resources:
           limits:
             memory: 500Mi
