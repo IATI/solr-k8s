@@ -302,7 +302,7 @@ Apply:
 https://artifacthub.io/packages/helm/apache-solr/solr-operator#upgrading-the-solr-operator
 
 ```
-> kubectl replace -f https://solr.apache.org/operator/downloads/crds/v0.4.0/all-with-dependencies.yaml
+> kubectl replace -f https://solr.apache.org/operator/downloads/crds/v0.5.0/all-with-dependencies.yaml
 
 customresourcedefinition.apiextensions.k8s.io/solrbackups.solr.apache.org replaced
 customresourcedefinition.apiextensions.k8s.io/solrclouds.solr.apache.org replaced
@@ -310,11 +310,11 @@ customresourcedefinition.apiextensions.k8s.io/solrprometheusexporters.solr.apach
 customresourcedefinition.apiextensions.k8s.io/zookeeperclusters.zookeeper.pravega.io replaced
 
 > helm repo update
-> helm upgrade solr-operator apache-solr/solr-operator --version 0.4.0
+> helm upgrade solr-operator apache-solr/solr-operator --version 0.5.0
 
 Release "solr-operator" has been upgraded. Happy Helming!
 NAME: solr-operator
-LAST DEPLOYED: Tue Sep 28 15:48:25 2021
+LAST DEPLOYED: Mon Nov 22 14:28:48 2021
 NAMESPACE: default
 STATUS: deployed
 REVISION: 2
@@ -327,6 +327,11 @@ Solr-Operator successfully installed!
 - v0.3.0 -> v0.4.0 
   - kicked off rolling restart of Solr and Zookeeper pods
   - Took a few hours
+
+- v0.4.0 -> v0.5.0 `dev`
+  - restarted the solr pod
+  - was back up in ~2min
+  - Collections still there, integration tests passed
 
 ## Helm
 Show installed charts information
