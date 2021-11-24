@@ -5,8 +5,7 @@ metadata:
 spec:
   customSolrKubeOptions:
     ingressOptions:
-      annotations:
-        kubernetes.io/ingress.class: nginx
+      ingressClassName: nginx
     podOptions:
       annotations:
         manualrestart: "2021-11-18T15:19:00Z"
