@@ -58,7 +58,8 @@ helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.service.loadBalancerIP="$IP_ADDRESS" \
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-$ENV" \
     --set-string controller.config.proxy-body-size="0" \
-    --set-string controller.config.large-client-header-buffers="4 128k"
+    --set-string controller.config.large-client-header-buffers="4 128k" \
+    --set-string controller.config.client-body-buffer-size="50M"
 
 # Check 
 kubectl get pods -l app.kubernetes.io/name=ingress-nginx \
