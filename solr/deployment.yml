@@ -80,7 +80,7 @@ spec:
       image:
         pullPolicy: IfNotPresent
         repository: pravega/zookeeper
-        tag: 0.2.9
+        tag: 0.2.12
       persistence:
         reclaimPolicy: Delete
         spec:
