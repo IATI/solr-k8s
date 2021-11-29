@@ -299,6 +299,7 @@ Apply:
 - Upgrading from 8.8.2 to 8.9.0 took approximately ~4hrs. Recommended to take a downtime for this by Solr docs.
 
 ## Upgrade Solr Operator Helm Chart
+https://apache.github.io/solr-operator/docs/upgrade-notes.html
 https://artifacthub.io/packages/helm/apache-solr/solr-operator#upgrading-the-solr-operator
 
 ```
