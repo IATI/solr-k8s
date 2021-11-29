@@ -171,9 +171,9 @@ helm repo add apache-solr https://solr.apache.org/charts
 helm repo update
 
 # Install helm chart and then solr-operator
-kubectl create -f https://solr.apache.org/operator/downloads/crds/v0.4.0/all-with-dependencies.yaml
+kubectl create -f https://solr.apache.org/operator/downloads/crds/v0.5.0/all-with-dependencies.yaml
 helm upgrade --install solr-operator apache-solr/solr-operator \
-  --version 0.4.0
+  --version 0.5.0
 
 # Check on whats running
 kubectl get pod -l control-plane=solr-operator
@@ -266,6 +266,12 @@ Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Sol
 kubectl logs iati-prod-solrcloud-1 | grep -A 5 SolrException > logs.txt
 ```
 
+Nginx Logs
+
+```bash
+k logs -l app.kubernetes.io/name=ingress-nginx
+```
+
 ## Maintenance Commands
 https://apache.github.io/solr-operator/docs/solr-cloud/managed-updates.html
 
@@ -283,7 +289,7 @@ Update tag to version in `deployment.yml`:
 ```yml
 solrImage:
     repository: solr
-    tag: 8.10.0
+    tag: 8.10.1
 ```
 
 Apply:
@@ -296,7 +302,7 @@ Apply:
 https://artifacthub.io/packages/helm/apache-solr/solr-operator#upgrading-the-solr-operator
 
 ```
-> kubectl replace -f https://solr.apache.org/operator/downloads/crds/v0.4.0/all-with-dependencies.yaml
+> kubectl replace -f https://solr.apache.org/operator/downloads/crds/v0.5.0/all-with-dependencies.yaml
 
 customresourcedefinition.apiextensions.k8s.io/solrbackups.solr.apache.org replaced
 customresourcedefinition.apiextensions.k8s.io/solrclouds.solr.apache.org replaced
@@ -304,14 +310,14 @@ customresourcedefinition.apiextensions.k8s.io/solrprometheusexporters.solr.apach
 customresourcedefinition.apiextensions.k8s.io/zookeeperclusters.zookeeper.pravega.io replaced
 
 > helm repo update
-> helm upgrade solr-operator apache-solr/solr-operator --version 0.4.0
+> helm upgrade solr-operator apache-solr/solr-operator --version 0.5.0
 
 Release "solr-operator" has been upgraded. Happy Helming!
 NAME: solr-operator
-LAST DEPLOYED: Tue Sep 28 15:48:25 2021
+LAST DEPLOYED: Mon Nov 29 09:38:57 2021
 NAMESPACE: default
 STATUS: deployed
-REVISION: 2
+REVISION: 3
 TEST SUITE: None
 NOTES:
 Solr-Operator successfully installed!
@@ -321,6 +327,9 @@ Solr-Operator successfully installed!
 - v0.3.0 -> v0.4.0 
   - kicked off rolling restart of Solr and Zookeeper pods
   - Took a few hours
+- v0.4.0 -> v0.5.0 
+  - kicked off rolling restart of Operator and Solr pods
+  - Took ~5 minutes, now downtime on the queries because redundancy
 
 ## Helm
 Show installed charts information

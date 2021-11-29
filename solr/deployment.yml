@@ -5,8 +5,7 @@ metadata:
 spec:
   customSolrKubeOptions:
     ingressOptions:
-      annotations:
-        kubernetes.io/ingress.class: nginx
+      ingressClassName: nginx
     podOptions:
       annotations:
         manualrestart: "2021-11-22T11:11:00Z"
@@ -67,7 +66,7 @@ spec:
   replicas: 3
   solrImage:
     repository: solr
-    tag: 8.10.0
+    tag: 8.10.1
   solrJavaMem: -Xms3g -Xmx3g
   updateStrategy:
     managed:
@@ -81,7 +80,7 @@ spec:
       image:
         pullPolicy: IfNotPresent
         repository: pravega/zookeeper
-        tag: 0.2.9
+        tag: 0.2.12
       persistence:
         reclaimPolicy: Delete
         spec:
@@ -92,6 +91,8 @@ spec:
               storage: 1Gi
       replicas: 3
       zookeeperPodPolicy:
+        annotations:
+          manualrestart: "2021-11-20T09:50:00Z"
         resources:
           limits:
             memory: 1Gi
