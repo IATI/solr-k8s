@@ -1,18 +1,20 @@
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
+  creationTimestamp: null
   name: letsencrypt
   namespace: cert-manager
 spec:
   acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
     email: code@iatistandard.org
+    preferredChain: ""
     privateKeySecretRef:
       name: letsencrypt-private-key
+    server: https://acme-v02.api.letsencrypt.org/directory
     solvers:
-      - dns01:
-          cloudflare:
-            email: niko@devinit.org
-            apiTokenSecretRef:
-              name: cloudflare-api-token-secret
-              key: api-token
+    - dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            key: api-token
+            name: cloudflare-api-token-secret
+          email: niko@devinit.org

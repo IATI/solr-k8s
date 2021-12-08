@@ -84,6 +84,11 @@ helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
     --set-string controller.config.client-header-buffer-size="512K"
 ```
 
+Upgrade with same values
+```zsh
+helm upgrade --reuse-values nginx-ingress ingress-nginx/ingress-nginx
+```
+
 ### Secrets
 
 https://github.com/bitnami-labs/sealed-secrets#installation
@@ -160,6 +165,13 @@ solrTLS:
 ```
 
 https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#certificate-renewal-and-rolling-restarts
+
+### Upgrading cert-manager
+https://cert-manager.io/docs/installation/upgrading/
+
+```bash
+helm upgrade --version v1.6.1 cert-manager jetstack/cert-manager
+```
 
 ### Solr Cloud
 
