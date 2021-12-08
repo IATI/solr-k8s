@@ -36,6 +36,14 @@ kubectl get nodes -o custom-columns=NAME:'{.metadata.name}',REGION:'{.metadata.l
 
 https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough
 
+### Upgrading Kubernetes
+https://docs.microsoft.com/en-gb/azure/aks/upgrade-cluster
+
+- Upgrading prod aks cluster (v1.19.X to v1.20.9), took ~30min. Caused a downtime. Afterwards had to do the following:
+  - Delete a zookeeper pod that was stuck at ContainerCreating
+  - Re-install/Upgrade nginx from the helm chart as it wasn't registering the solr pods as active
+  - Login to Grafana dashboard and set password again (it was back to the default)
+
 ### Ingress
 
 ```bash
