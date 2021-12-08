@@ -73,6 +73,8 @@ az network public-ip list --resource-group $POD_RG --query "[?name=='pip-solr-$E
 
 ### Upgrade / Config Change NGINX
 
+https://github.com/kubernetes/ingress-nginx/
+
 ```zsh
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.replicaCount=1 \
@@ -84,6 +86,11 @@ helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
     --set-string controller.config.proxy-body-size="0" \
     --set-string controller.config.large-client-header-buffers="4 128k"
     # ADD MORE
+```
+
+Upgrade with same values
+```zsh
+helm upgrade --reuse-values nginx-ingress ingress-nginx/ingress-nginx
 ```
 
 ### Secrets
@@ -164,6 +171,13 @@ solrTLS:
 ```
 
 https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#certificate-renewal-and-rolling-restarts
+
+### Upgrading cert-manager
+https://cert-manager.io/docs/installation/upgrading/
+
+```bash
+helm upgrade --version v1.6.1 cert-manager jetstack/cert-manager
+```
 
 ### Solr Cloud
 
