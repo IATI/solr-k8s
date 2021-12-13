@@ -8,7 +8,7 @@ spec:
       ingressClassName: nginx
     podOptions:
       annotations:
-        manualrestart: "2021-11-22T11:11:00Z"
+        manualrestart: "2021-12-13T10:17:00Z"
       resources:
         limits:
           memory: 9Gi
