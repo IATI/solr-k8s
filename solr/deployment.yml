@@ -68,6 +68,7 @@ spec:
     repository: solr
     tag: 8.10.1
   solrJavaMem: -Xms3g -Xmx3g
+  solrOpts: "-Dlog4j2.formatMsgNoLookups=true"
   updateStrategy:
     managed:
       maxPodsUnavailable: 1
