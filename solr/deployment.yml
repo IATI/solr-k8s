@@ -130,5 +130,11 @@ spec:
     keyStorePasswordSecret:
       name: pkcs12-keystore-password-dev
       key: password-key
+    trustStorePasswordSecret:
+      name: lets-encrypt-truststore-secret
+      key: password-key
+    trustStoreSecret:
+      name: lets-encrypt-truststore-secret
+      key: truststore.p12
   solrSecurity:
     authenticationType: Basic
