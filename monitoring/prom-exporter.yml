@@ -9,7 +9,7 @@ spec:
     podOptions:
       resources:
         requests:
-          cpu: 300m
+          cpu: 200m
           memory: 900Mi
   solrReference:
     cloud:

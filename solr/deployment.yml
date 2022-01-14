@@ -70,9 +70,6 @@ spec:
   solrJavaMem: -Xms3g -Xmx3g
   solrOpts: "-Dlog4j2.formatMsgNoLookups=true"
   updateStrategy:
-    managed:
-      maxPodsUnavailable: 1
-      maxShardReplicasUnavailable: 1
     method: Managed
     restartSchedule: "0 7 * * *"
   zookeeperRef:
