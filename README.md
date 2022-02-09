@@ -174,6 +174,14 @@ solrTLS:
 
 https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#certificate-renewal-and-rolling-restarts
 
+**NOTE** currently there is a bug, have implemented the workaround on DEV, but not PROD: https://github.com/apache/solr-operator/issues/390
+
+#### Force Renewal
+
+Use [cert-manager kubectl plugin](https://cert-manager.io/docs/usage/kubectl-plugin/)
+
+- `k cert-manager renew tls-secret-<env>`
+
 ### Upgrading cert-manager
 https://cert-manager.io/docs/installation/upgrading/
 
