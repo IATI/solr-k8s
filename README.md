@@ -174,7 +174,7 @@ solrTLS:
 
 https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#certificate-renewal-and-rolling-restarts
 
-**NOTE** currently there is a bug, have implemented the workaround on DEV, but not PROD: https://github.com/apache/solr-operator/issues/390
+**NOTE** currently there is a bug, have implemented the workaround on dev and prod: https://github.com/apache/solr-operator/issues/390
 
 #### Force Renewal
 
