@@ -71,7 +71,7 @@ spec:
   solrOpts: "-Dlog4j2.formatMsgNoLookups=true"
   updateStrategy:
     method: Managed
-    restartSchedule: "0 7 * * *"
+    restartSchedule: "0 6 * * *"
   zookeeperRef:
     provided:
       chroot: /iatisolrdev
