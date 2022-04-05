@@ -261,6 +261,16 @@ kubectl get po -l solr-cloud=iati-prod,technology=zookeeper \
 Install Prometheus stack
 https://apache.github.io/solr-operator/docs/solr-prometheus-exporter/#prometheus-stack
 
+Make persistent
+```
+helm upgrade mon prometheus-community/kube-prometheus-stack \
+  -n monitoring \
+  --install \
+  --set grafana.enabled=true \
+  --set grafana.persistence.enabled=true \
+  --set grafana.persistence.size=10Gi
+```
+
 ```bash
 # Check
 kubectl get pods -n monitoring
