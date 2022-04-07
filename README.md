@@ -307,6 +307,12 @@ http://localhost:3000
 username: admin
 initial pw: prom-operator
 
+## Login and change password, or use Grafana CLI. CLI can be used to reset pw if forgotten
+
+```bash
+k exec -n monitoring <grafana-pod-name> -c grafana -- grafana-cli admin reset-admin-password <pw>
+```
+
 Import Dashboard id: `12456`
 Data source: Prometheus
 
