@@ -13,7 +13,7 @@ spec:
         limits:
           memory: 8Gi
         requests:
-          cpu: 500m
+          cpu: 600m
           memory: 8Gi
       initContainers:
         - name: set-zone
