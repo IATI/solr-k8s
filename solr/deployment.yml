@@ -135,5 +135,7 @@ spec:
       key: truststore.p12
   solrSecurity:
     authenticationType: Basic
+  solrModules:
+    - cell
   additionalLibs:
     - contrib/extraction/lib
