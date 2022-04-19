@@ -34,6 +34,18 @@ spec:
           volumeMounts:
             - name: initdb
               mountPath: /docker-entrypoint-initdb.d
+        - name: "install-extractions-lib"
+          image: solr:8.10.1
+          command:
+          - 'sh'
+          - '-c'
+          - |
+            cp contrib/extraction/lib/*.jar server/solr-webapp/webapp/WEB-INF/lib/
+            cp dist/solr-cell-*.jar server/solr-webapp/webapp/WEB-INF/lib/
+            cp -R server/solr-webapp/webapp/WEB-INF/lib/* /tmp-webinf-lib
+          volumeMounts:
+          - mountPath: /tmp-webinf-lib
+            name: web-inf-lib
       volumes:
       - defaultContainerMount:
           mountPath: /docker-entrypoint-initdb.d
@@ -41,6 +53,13 @@ spec:
         name: initdb
         source:
           emptyDir: {}
+      volumes:
+      - name: web-inf-lib
+        source:
+          emptyDir: {}
+        defaultContainerMount:
+          name: web-inf-lib
+          mountPath: /opt/solr/server/solr-webapp/webapp/WEB-INF/lib
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
