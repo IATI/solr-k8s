@@ -40,9 +40,9 @@ spec:
           - 'sh'
           - '-c'
           - |
-            cp contrib/extraction/lib/*.jar server/solr-webapp/webapp/WEB-INF/lib/
-            cp dist/solr-cell-*.jar server/solr-webapp/webapp/WEB-INF/lib/
-            cp -R server/solr-webapp/webapp/WEB-INF/lib/* /tmp-webinf-lib
+            cp /opt/solr-8.10.1/contrib/extraction/lib/*.jar /opt/solr-8.10.1/server/solr-webapp/webapp/WEB-INF/lib/
+            cp /opt/solr-8.10.1/dist/solr-cell-8.10.1.jar /opt/solr-8.10.1/server/solr-webapp/webapp/WEB-INF/lib/
+            cp -R /opt/solr-8.10.1/server/solr-webapp/webapp/WEB-INF/lib/* /tmp-webinf-lib
           volumeMounts:
           - mountPath: /tmp-webinf-lib
             name: web-inf-lib
@@ -58,7 +58,7 @@ spec:
           emptyDir: {}
         defaultContainerMount:
           name: web-inf-lib
-          mountPath: /opt/solr/server/solr-webapp/webapp/WEB-INF/lib
+          mountPath: /opt/solr-8.10.1/server/solr-webapp/webapp/WEB-INF/lib
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
