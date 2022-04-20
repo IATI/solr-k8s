@@ -40,9 +40,9 @@ spec:
           - 'sh'
           - '-c'
           - |
-            cp /opt/solr-8.10.1/contrib/extraction/lib/*.jar /opt/solr-8.10.1/server/solr-webapp/webapp/WEB-INF/lib/
-            cp /opt/solr-8.10.1/dist/solr-cell-8.10.1.jar /opt/solr-8.10.1/server/solr-webapp/webapp/WEB-INF/lib/
             cp -R /opt/solr-8.10.1/server/solr-webapp/webapp/WEB-INF/lib/* /tmp-webinf-lib
+            cp /opt/solr-8.10.1/contrib/extraction/lib/*.jar /tmp-webinf-lib/
+            cp /opt/solr-8.10.1/dist/solr-cell-8.10.1.jar /tmp-webinf-lib/
           volumeMounts:
           - mountPath: /tmp-webinf-lib
             name: web-inf-lib
