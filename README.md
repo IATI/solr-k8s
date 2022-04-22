@@ -281,6 +281,14 @@ Data source: Prometheus
 # Add ingress rule to allow dashboard access at dashboard.solr.iatistandard.org
 kubectl apply -f infrastructure/ingress/dashboard-ingress.yml
 ``` 
+
+Change Grafana root_url (Note, this completely resets Grafana)
+```bash
+helm upgrade mon prometheus-community/kube-prometheus-stack -n monitoring --install \
+    --set grafana.enabled=true \
+    --set grafana.'grafana\.ini'.server.root_url=https://dashboard.solr-dev.iatistandard.org/
+```
+
 ## Logs
 Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Solr. Otherwise the errors are about syncing between the replicas and not the root error.
 ```bash
