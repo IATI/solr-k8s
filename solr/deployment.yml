@@ -13,7 +13,7 @@ spec:
         limits:
           memory: 9Gi
         requests:
-          cpu: 800m
+          cpu: 700m
           memory: 9Gi
       initContainers:
         - name: set-zone
@@ -68,7 +68,7 @@ spec:
     repository: solr
     tag: 8.10.1
   solrJavaMem: -Xms3g -Xmx3g
-  solrOpts: "-Dlog4j2.formatMsgNoLookups=true"
+  solrOpts: "-Dlog4j2.formatMsgNoLookups=true -Dsolr.cloud.client.stallTime=30000 -Dsolr.environment=prod"
   updateStrategy:
     managed:
       maxPodsUnavailable: 1
