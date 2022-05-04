@@ -59,6 +59,14 @@ https://docs.microsoft.com/en-gb/azure/aks/upgrade-cluster
 - I eventually was able to get a zookeeper pod to be rescheduled on the 4th node, through random deleting/cordoning, then I cordoned the 4th node and deleted the pod so it would be rescheduled back on my original 3 pods.
 - That got Solr fully healthy so I reduced the number of nodes back down to 3.
 
+#### Upgrade 1.21.9 to 1.22.6
+
+- Prod Solr was actually in a bad place before I started this. I think the bumping of CPU to 800m had caused one of the pods not to be able to be scheduled on the regular restarts.
+- I applied the change back to 700m and then scaled to 4 nodes.
+- Waited for that to stabilise (which took quite a while of it failing to schedule pods, then reshuffling, then failing, then took time for the collections to recover etc.). Eventually it did stabilise.
+- Ran upgrade command at 9:27am
+- Took around 30-40min to upgrade all the nodes and get things stable
+- Reduced down to 3 nodes, that was quite quick, although the nodes are now close to limits on cpu/memory so need to look at scaling these before the next upgrade.
 
 ### Ingress
 
