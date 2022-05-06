@@ -1,7 +1,8 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: tls-secret-dev
+  name: tls-secret-test
+  namespace: default
   annotations:
     issue-temporary-certificate: "true"
 spec:
@@ -9,16 +10,16 @@ spec:
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt
-  commonName: "*.solr-dev.iatistandard.org"
+  commonName: "*.solr-test.iatistandard.org"
   dnsNames:
-    - "solr-dev.iatistandard.org"
-    - "*.solr-dev.iatistandard.org"
+    - "solr-test.iatistandard.org"
+    - "*.solr-test.iatistandard.org"
   keystores:
     pkcs12:
       create: true
       passwordSecretRef:
         key: password-key
-        name: pkcs12-keystore-password-dev
+        name: pkcs12-password-secret-dev
   subject:
     countries:
       - UK

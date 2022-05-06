@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - dashboard.solr-dev.iatistandard.org
+    - dashboard.solr-test.iatistandard.org
     secretName: tls-secret
   rules:
-  - host: dashboard.solr-dev.iatistandard.org
+  - host: dashboard.solr-test.iatistandard.org
     http:
       paths:
       - path: /
