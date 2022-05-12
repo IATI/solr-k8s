@@ -9,16 +9,16 @@ spec:
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt
-  commonName: "*.solr.iatistandard.org"
+  commonName: "*.solr-new-prod.iatistandard.org"
   dnsNames:
-    - "solr.iatistandard.org"
-    - "*.solr.iatistandard.org"
+    - "solr-new-prod.iatistandard.org"
+    - "*.solr-new-prod.iatistandard.org"
   keystores:
     pkcs12:
       create: true
       passwordSecretRef:
         key: password-key
-        name: pkcs12-keystore-password
+        name: pkcs12-password-secret-prod
   subject:
     countries:
       - UK
