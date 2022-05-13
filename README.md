@@ -8,7 +8,7 @@ Repo containing kubernetes deployment information for IATI Solr Production insta
 
 ```bash
 # Set ENV
-ENV=test
+ENV=new-dev
 
 # Create resource group
 az group create --resource-group rg-solr-$ENV --location uksouth
@@ -31,9 +31,7 @@ az aks get-credentials --resource-group $RG --name aks-solr-$ENV
 kubectl get nodes -o custom-columns=NAME:'{.metadata.name}',REGION:'{.metadata.labels.topology\.kubernetes\.io/region}',ZONE:'{metadata.labels.topology\.kubernetes\.io/zone}'
 
 # NAME                                REGION    ZONE
-# aks-nodepool1-74884023-vmss000000   uksouth   uksouth-1
-# aks-nodepool1-74884023-vmss000001   uksouth   uksouth-2
-# aks-nodepool1-74884023-vmss000002   uksouth   uksouth-3
+# aks-nodepool1-19045045-vmss000004   uksouth   0
 ```
 
 https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough

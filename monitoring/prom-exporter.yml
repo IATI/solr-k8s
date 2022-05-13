@@ -3,7 +3,7 @@ kind: SolrPrometheusExporter
 metadata:
   labels:
     controller-tools.k8s.io: "1.0"
-  name: prom-exporter-test
+  name: prom-exporter-dev
 spec:
   customKubeOptions:
     podOptions:
@@ -13,8 +13,8 @@ spec:
           memory: 900Mi
   solrReference:
     cloud:
-      name: iati-test
-    basicAuthSecret: iati-test-solrcloud-basic-auth
+      name: iati-dev
+    basicAuthSecret: iati-dev-solrcloud-basic-auth
     solrTLS:
       restartOnTLSSecretUpdate: true
       pkcs12Secret:

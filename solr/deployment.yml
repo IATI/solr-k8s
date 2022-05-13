@@ -1,7 +1,7 @@
 apiVersion: solr.apache.org/v1beta1
 kind: SolrCloud
 metadata:
-  name: iati-test
+  name: iati-dev
 spec:
   customSolrKubeOptions:
     ingressOptions:
@@ -11,10 +11,10 @@ spec:
         manualrestart: "2021-11-18T15:19:00Z"
       resources:
         limits:
-          memory: 8Gi
+          memory: 10Gi
         requests:
-          cpu: 700m
-          memory: 8Gi
+          cpu: 2000m
+          memory: 10Gi
       initContainers:
         - name: set-zone
           image: roffe/kubectl
@@ -71,7 +71,7 @@ spec:
                 - key: "solr-cloud"
                   operator: In
                   values:
-                  - iati-test
+                  - iati-dev
               topologyKey: kubernetes.io/hostname
   dataStorage:
     persistent:
@@ -86,13 +86,13 @@ spec:
     repository: solr
     tag: 8.11.1
   solrJavaMem: -Xms3g -Xmx3g
-  solrOpts: "-Dlog4j2.formatMsgNoLookups=true -Dsolr.cloud.client.stallTime=30000 -Dsolr.environment=test,label=iati-test,color=aqua"
+  solrOpts: "-Dlog4j2.formatMsgNoLookups=true -Dsolr.cloud.client.stallTime=30000 -Dsolr.environment=dev,label=iati-dev,color=aqua"
   updateStrategy:
     method: Managed
     restartSchedule: "0 6 * * *"
   zookeeperRef:
     provided:
-      chroot: /iatisolrtest
+      chroot: /iatisolrdev
       image:
         pullPolicy: IfNotPresent
         repository: pravega/zookeeper
@@ -127,7 +127,7 @@ spec:
                   - key: "solr-cloud"
                     operator: In
                     values:
-                    - iati-test
+                    - iati-dev
                 topologyKey: kubernetes.io/hostname
   solrAddressability:
     commonServicePort: 443
