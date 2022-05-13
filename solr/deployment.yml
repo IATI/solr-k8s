@@ -8,7 +8,7 @@ spec:
       ingressClassName: nginx
     podOptions:
       nodeSelector:
-        agentpool: solrnodepool
+        nodepooltype: solr
       annotations:
         manualrestart: "2021-12-13T10:17:00Z"
       resources:
@@ -95,7 +95,7 @@ spec:
       replicas: 3
       zookeeperPodPolicy:
         nodeSelector:
-          agentpool: solrnodepool
+          nodepooltype: solr
         annotations:
           manualrestart: "2021-11-20T09:50:00Z"
         resources:

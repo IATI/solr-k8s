@@ -21,7 +21,8 @@ az aks create \
     --node-vm-size "Standard_B2s" \
     --vm-set-type VirtualMachineScaleSets \
     --load-balancer-sku standard \
-    --node-count 1
+    --node-count 1 \
+    --nodepool-labels nodepooltype=service
 
 # Get context of your cluster and set that as your kubectl context
 az aks get-credentials --resource-group $RG --name $NAME
@@ -86,8 +87,11 @@ helm repo update
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.replicaCount=2 \
     --set controller.nodeSelector."kubernetes\.io/os"=linux \
+    --set controller.nodeSelector.nodepooltype=service \
     --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
+    --set defaultBackend.nodeSelector.nodepooltype=service \
     --set controller.admissionWebhooks.patch.nodeSelector."kubernetes\.io/os"=linux \
+    --set controller.admissionWebhooks.patch.nodeSelector.nodepooltype=service \
     --set controller.service.loadBalancerIP="$IP_ADDRESS" \
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-$ENV" \
     --set-string controller.config.proxy-body-size="0" \
@@ -109,16 +113,7 @@ az network public-ip list --resource-group $POD_RG --query "[?name=='pip-solr-$E
 ```zsh
 # get IP address from above
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-    --set controller.replicaCount=2 \
-    --set controller.nodeSelector."kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
-    --set controller.admissionWebhooks.patch.nodeSelector."kubernetes\.io/os"=linux \
-    --set controller.service.loadBalancerIP="$IP_ADDRESS" \
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-$ENV" \
-    --set-string controller.config.proxy-body-size="0" \
-    --set-string controller.config.large-client-header-buffers="4 128k" \
-    --set-string controller.config.client-body-buffer-size="50M"
-    # ADD MORE
+    # All of --set above and ADD MORE
 ```
 
 Upgrade with same values
@@ -132,8 +127,9 @@ https://github.com/bitnami-labs/sealed-secrets#installation
 
 #### Install Sealed Secrets
 ```bash
-helm install sealed-secrets sealed-secrets \
---repo https://bitnami-labs.github.io/sealed-secrets
+helm upgrade --install sealed-secrets sealed-secrets \
+--repo https://bitnami-labs.github.io/sealed-secrets \
+--set nodeSelector.nodepooltype=service
 ```
 
 #### Install kubeseal
@@ -155,7 +151,10 @@ Install cert-manager (if not already installed): https://apache.github.io/solr-o
 # Install CRDs separately to allow you to easily uninstall and reinstall cert-manager without deleting your installed custom resources.
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.crds.yaml
 # Install cert-manager from helm chart
-helm install cert-manager --version v1.8.0 jetstack/cert-manager
+helm upgrade --install cert-manager --version v1.8.0 jetstack/cert-manager \
+  --set nodeSelector.nodepooltype=service \
+  --set webhook.nodeSelector.nodepooltype=service \
+  --set cainjector.nodeSelector.nodepooltype=service
 ```
 
 Issue Certifiate Using Cloudflare DNS lookup challenge cert-manager
@@ -222,9 +221,6 @@ Use [cert-manager kubectl plugin](https://cert-manager.io/docs/usage/kubectl-plu
 ### Upgrading cert-manager
 https://cert-manager.io/docs/installation/upgrading/
 
-```bash
-helm upgrade --version v1.8.0 cert-manager jetstack/cert-manager
-```
 
 ### Solr Cloud
 
@@ -239,7 +235,8 @@ az aks nodepool add \
     --name solrnodepool \
     --node-count 3 \
     --node-vm-size "Standard_E2as_v4" \
-    --zones 1 2 3
+    --zones 1 2 3 \
+    --labels nodepooltype=solr
 
 # list out nodes and zones
 kubectl get nodes -o custom-columns=NAME:'{.metadata.name}',REGION:'{.metadata.labels.topology\.kubernetes\.io/region}',ZONE:'{metadata.labels.topology\.kubernetes\.io/zone}'
@@ -260,10 +257,10 @@ helm repo update
 
 # Install helm chart and then solr-operator
 kubectl create -f https://solr.apache.org/operator/downloads/crds/v0.5.1/all-with-dependencies.yaml
-helm install solr-operator apache-solr/solr-operator \
+helm upgrade --install solr-operator apache-solr/solr-operator \
  --version 0.5.1 \
- --set nodeSelector.agentpool=nodepool1 \
- --set zookeeper-operator.nodeSelector.agentpool=nodepool1
+ --set nodeSelector.nodepooltype=service \
+ --set zookeeper-operator.nodeSelector.nodepooltype=service
 
 # Check on whats running
 kubectl get pod -l control-plane=solr-operator
@@ -314,14 +311,14 @@ https://apache.github.io/solr-operator/docs/solr-prometheus-exporter/#prometheus
 Make persistent
 ```bash
 kubectl create ns monitoring
-## HERE TYING TO GET NODESELECTORS TO WORK
 helm upgrade --install mon prometheus-community/kube-prometheus-stack \
   -n monitoring \
   --set kubeStateMetrics.enabled=false \
   --set nodeExporter.enabled=false \
-  --set prometheusSpec.nodeSelector.agentpool=nodepool1 \
-  --set prometheusOperator.nodeSelector.agentpool=nodepool1 \
-  --set alertmanagerSpec.nodeSelector={"agentpool": "nodepool1"} \
+  --set prometheusOperator.nodeSelector.nodepooltype=service \
+  --set prometheus.prometheusSpec.nodeSelector.nodepooltype=service \
+  --set alertmanager.alertmanagerSpec.nodeSelector.nodepooltype=service \
+  --set grafana.nodeSelector.nodepooltype=service \
   --set grafana.enabled=true \
   --set grafana.persistence.enabled=true \
   --set grafana.persistence.size=10Gi \

@@ -1,14 +1,12 @@
 apiVersion: solr.apache.org/v1beta1
 kind: SolrPrometheusExporter
 metadata:
-  labels:
-    controller-tools.k8s.io: "1.0"
   name: prom-exporter-prod
 spec:
   customKubeOptions:
     podOptions:
       nodeSelector:
-        agentpool: solrnodepool
+        nodepooltype: service
       resources:
         requests:
           cpu: 300m
@@ -23,6 +21,6 @@ spec:
         name: solr-tls
         key: keystore.p12
       keyStorePasswordSecret:
-        name: pkcs12-keystore-password
+        name: pkcs12-password-secret-prod
         key: password-key
   numThreads: 6

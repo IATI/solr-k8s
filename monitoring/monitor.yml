@@ -5,8 +5,6 @@ metadata:
   labels:
     release: mon
 spec:
-  nodeSelector:
-    agentpool: solrnodepool
   selector:
     matchLabels:
       solr-prometheus-exporter: prom-exporter-prod
