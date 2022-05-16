@@ -86,14 +86,7 @@ https://github.com/kubernetes/ingress-nginx/
 
 ```zsh
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-    --set controller.replicaCount=1 \
-    --set controller.nodeSelector."kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
-    --set controller.admissionWebhooks.patch.nodeSelector."kubernetes\.io/os"=linux \
-    --set controller.service.loadBalancerIP="$IP_ADDRESS" \
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-$ENV" \
-    --set-string controller.config.proxy-body-size="0" \
-    --set-string controller.config.large-client-header-buffers="4 128k"
+    # Above Values to re-use, or try --reuse-values
     # ADD MORE
 ```
 
