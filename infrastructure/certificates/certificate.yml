@@ -10,10 +10,10 @@ spec:
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt
-  commonName: "*.solr-test.iatistandard.org"
+  commonName: "*.solr-dev.iatistandard.org"
   dnsNames:
-    - "solr-test.iatistandard.org"
-    - "*.solr-test.iatistandard.org"
+    - "solr-dev.iatistandard.org"
+    - "*.solr-dev.iatistandard.org"
   keystores:
     pkcs12:
       create: true
