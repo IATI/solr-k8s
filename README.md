@@ -2,7 +2,18 @@
 
 Repo containing kubernetes deployment information for IATI Solr Production instance
 
-## Deployment Steps
+## Current Cluster
+
+NOTE: the current cluster is named `aks-solr-test` in resource group `aks-solr-test`. The below instructions assume you're creating a NEW cluster called `aks-solr-new-dev`. 
+
+https://github.com/IATI/IATI-Internal-Wiki/blob/main/IATI-Unified-Infra/Solr.md#dev
+
+```bash
+# Get context of this cluster and set that as your kubectl context
+az aks get-credentials --resource-group aks-solr-test --name aks-solr-test
+```
+
+## New Cluster Deployment Steps
 
 ### Initial Setup / kubectl Context
 
