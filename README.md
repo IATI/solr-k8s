@@ -4,7 +4,7 @@ Repo containing kubernetes deployment information for IATI Solr Production insta
 
 ## Current Cluster
 
-NOTE: the current cluster is named `aks-solr-test` in resource group `aks-solr-test`. The below instructions assume you're creating a NEW cluster called `aks-solr-new-dev`. 
+NOTE: the current cluster is named `aks-solr-test` in resource group `rg-solr-test`. The below instructions assume you're creating a NEW cluster called `aks-solr-new-dev`. 
 
 https://github.com/IATI/IATI-Internal-Wiki/blob/main/IATI-Unified-Infra/Solr.md#dev
 
