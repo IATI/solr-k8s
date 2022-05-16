@@ -2,13 +2,24 @@
 
 Repo containing kubernetes deployment information for IATI Solr Production instance
 
-## Deployment Steps
+## Current Cluster
+
+NOTE: the current cluster is named `aks-solr-test` in resource group `rg-solr-test`. The below instructions assume you're creating a NEW cluster called `aks-solr-new-dev`. 
+
+https://github.com/IATI/IATI-Internal-Wiki/blob/main/IATI-Unified-Infra/Solr.md#dev
+
+```bash
+# Get context of this cluster and set that as your kubectl context
+az aks get-credentials --resource-group aks-solr-test --name aks-solr-test
+```
+
+## New Cluster Deployment Steps
 
 ### Initial Setup / kubectl Context
 
 ```bash
 # Set ENV
-ENV=dev
+ENV=new-dev
 
 # Create resource group
 az group create --resource-group rg-solr-$ENV --location uksouth
@@ -19,7 +30,7 @@ az aks create \
     --resource-group $RG \
     --name aks-solr-$ENV \
     --generate-ssh-keys \
-    --node-vm-size "Standard_E2as_v4" \
+    --node-vm-size "standard_B4ms" \
     --vm-set-type VirtualMachineScaleSets \
     --load-balancer-sku standard \
     --node-count 1
@@ -31,9 +42,7 @@ az aks get-credentials --resource-group $RG --name aks-solr-$ENV
 kubectl get nodes -o custom-columns=NAME:'{.metadata.name}',REGION:'{.metadata.labels.topology\.kubernetes\.io/region}',ZONE:'{metadata.labels.topology\.kubernetes\.io/zone}'
 
 # NAME                                REGION    ZONE
-# aks-nodepool1-74884023-vmss000000   uksouth   uksouth-1
-# aks-nodepool1-74884023-vmss000001   uksouth   uksouth-2
-# aks-nodepool1-74884023-vmss000002   uksouth   uksouth-3
+# aks-nodepool1-19045045-vmss000004   uksouth   0
 ```
 
 https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough
@@ -52,9 +61,9 @@ helm repo update
 # Use Helm to deploy an NGINX ingress controller
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
     --set controller.replicaCount=1 \
-    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux \
+    --set controller.nodeSelector."kubernetes\.io/os"=linux \
+    --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
+    --set controller.admissionWebhooks.patch.nodeSelector."kubernetes\.io/os"=linux \
     --set controller.service.loadBalancerIP="$IP_ADDRESS" \
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-$ENV" \
     --set-string controller.config.proxy-body-size="0" \
@@ -68,7 +77,7 @@ kubectl get pods -l app.kubernetes.io/name=ingress-nginx \
 kubectl get services -o wide -w nginx-ingress-ingress-nginx-controller
 
 az network public-ip list --resource-group $POD_RG --query "[?name=='pip-solr-$ENV'].[dnsSettings.fqdn]" -o tsv
-# aks-solr-prod.uksouth.cloudapp.azure.com
+# aks-solr-$ENV.uksouth.cloudapp.azure.com
 ```
 
 ### Upgrade / Config Change NGINX
@@ -77,14 +86,7 @@ https://github.com/kubernetes/ingress-nginx/
 
 ```zsh
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-    --set controller.replicaCount=1 \
-    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set controller.service.loadBalancerIP="$IP_ADDRESS" \
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-$ENV" \
-    --set-string controller.config.proxy-body-size="0" \
-    --set-string controller.config.large-client-header-buffers="4 128k"
+    # Above Values to re-use, or try --reuse-values
     # ADD MORE
 ```
 
@@ -99,42 +101,49 @@ https://github.com/bitnami-labs/sealed-secrets#installation
 
 #### Install Sealed Secrets
 ```bash
-kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.16.0/controller.yaml
+helm install sealed-secrets sealed-secrets \
+--repo https://bitnami-labs.github.io/sealed-secrets
 ```
 
-#### Install kubeseal
+#### Install kubeseal cli tool
 - Follow above link
 
 ### Create a sealed secret
 
 ```bash
-kubeseal -o yaml < my-secret.yaml > my-secret-sealed.yaml
+kubeseal --controller-name sealed-secrets --controller-namespace default -o yaml < my-secret.yaml > my-secret-sealed.yaml
 kubectl apply -f my-secret-sealed.yaml
 ```
 Commit my-secret-sealed.yaml into git with no worries. Delete my-secret.yaml
 
 ### Certificate Generation
 
-Install cert-manager (if not already installed): https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#use-cert-manager-to-issue-the-certificate
+Install cert-manager (if not already installed): 
+https://artifacthub.io/packages/helm/cert-manager/cert-manager
 
-Issue Certifiate Using Cloudflare DNS lookup challenge cert-manager
+Issue Certificate Using Cloudflare DNS lookup challenge cert-manager
 https://cert-manager.io/docs/configuration/acme/dns01/cloudflare/
 
 ```bash
+# Install CRDs separately to allow you to easily uninstall and reinstall cert-manager without deleting your installed custom resources.
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.crds.yaml
 # Install cert-manager from helm chart
-helm install cert-manager jetstack/cert-manager \
-  --version v1.3.1 \
-  --set installCRDs=true
+helm install cert-manager --version v1.8.0 jetstack/cert-manager
 ```
+
+Create cloudflare api token secret
+Follow https://cert-manager.io/docs/configuration/acme/dns01/cloudflare/ to get API and an put in .yaml file. Then seal the secret following instructions above for using kubseal.
 
 ```bash
 # Create certificate ClusterIssuer
-kubectl apply -f infrastructure/certificates/secrets/cloudflare-api-token-sealed.yaml # api token secret, needs to be re-created per cluster
-kubectl apply -f infrastructure/certificates/cert-issuer.yml
+cd infrastructure/certificates/secrets
+kubeseal --controller-name sealed-secrets --controller-namespace default -o yaml < cloudflare-api-token-secret.yaml > cloudflare-api-token-sealed.yaml
+kubectl apply -f cloudflare-api-token-sealed.yaml # api token secret, needs to be re-created per cluster
+kubectl apply -f ../cert-issuer.yml
 
 # Issue certificate
-kubectl apply -f infrastructure/certificates/secrets/pkcs12-keystore-password-dev-sealed.yaml # password, needs to be re-created per cluster
-kubectl apply -f infrastructure/certificates/certificate.yml
+kubectl apply -f pkcs12-keystore-password-dev.yaml # password, needs to be re-created per cluster, sealed doesn't work for Solr.
+kubectl apply -f ../certificate.yml
 
 # Check Progress
 kubectl get certificates
@@ -176,7 +185,7 @@ https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#certi
 https://cert-manager.io/docs/installation/upgrading/
 
 ```bash
-helm upgrade --version v1.6.1 cert-manager jetstack/cert-manager
+helm upgrade --version v1.8.0 cert-manager jetstack/cert-manager
 ```
 
 ### Solr Cloud
@@ -189,9 +198,8 @@ helm repo add apache-solr https://solr.apache.org/charts
 helm repo update
 
 # Install helm chart and then solr-operator
-kubectl create -f https://solr.apache.org/operator/downloads/crds/v0.4.0/all-with-dependencies.yaml
-helm upgrade --install solr-operator apache-solr/solr-operator \
-  --version 0.4.0
+kubectl create -f https://solr.apache.org/operator/downloads/crds/v0.5.1/all-with-dependencies.yaml
+helm install solr-operator apache-solr/solr-operator --version 0.5.1
 
 # Check on whats running
 kubectl get pod -l control-plane=solr-operator
@@ -220,23 +228,23 @@ kubectl get secret iati-$ENV-solrcloud-security-bootstrap \
 # Solr user pw
 kubectl get secret iati-$ENV-solrcloud-security-bootstrap -o jsonpath='{.data.solr}' | base64 --decode
 
-### HA
-
-Check Pods are distributed to unique Nodes
-```bash
-kubectl get po -l solr-cloud=iati-prod,technology=solr-cloud \
-  -o json | jq -r '.items | sort_by(.spec.nodeName)[] | [.spec.nodeName] | @tsv' | uniq | wc -l
-# 3
-
-kubectl get po -l solr-cloud=iati-prod,technology=zookeeper \
-  -o json | jq -r '.items | sort_by(.spec.nodeName)[] | [.spec.nodeName] | @tsv' | uniq | wc -l
-# 3
 ```
 
 ### Monitoring
 
 Install Prometheus stack
 https://apache.github.io/solr-operator/docs/solr-prometheus-exporter/#prometheus-stack
+
+Install w/ helm and make persistent, set root_url
+```
+helm upgrade mon prometheus-community/kube-prometheus-stack \
+  -n monitoring \
+  --install \
+  --set grafana.enabled=true \
+  --set grafana.persistence.enabled=true \
+  --set grafana.persistence.size=10Gi \
+  --set grafana.'grafana\.ini'.server.root_url=https://dashboard.solr-dev.iatistandard.org/
+```
 
 ```bash
 # Check
@@ -278,16 +286,9 @@ Import Dashboard id: `12456`
 Data source: Prometheus
 
 ```bash
-# Add ingress rule to allow dashboard access at dashboard.solr.iatistandard.org
+# Add ingress rule to allow dashboard access at dashboard.solr-$ENV.iatistandard.org
 kubectl apply -f infrastructure/ingress/dashboard-ingress.yml
 ``` 
-
-Change Grafana root_url (Note, this completely resets Grafana)
-```bash
-helm upgrade mon prometheus-community/kube-prometheus-stack -n monitoring --install \
-    --set grafana.enabled=true \
-    --set grafana.'grafana\.ini'.server.root_url=https://dashboard.solr-dev.iatistandard.org/
-```
 
 ## Logs
 Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Solr. Otherwise the errors are about syncing between the replicas and not the root error.

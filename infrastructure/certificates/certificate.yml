@@ -2,6 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: tls-secret-dev
+  namespace: default
   annotations:
     issue-temporary-certificate: "true"
 spec:
@@ -18,7 +19,7 @@ spec:
       create: true
       passwordSecretRef:
         key: password-key
-        name: pkcs12-keystore-password-dev
+        name: pkcs12-password-secret-dev
   subject:
     countries:
       - UK
