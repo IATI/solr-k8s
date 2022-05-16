@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -24,7 +27,7 @@
   "gnetId": 12456,
   "graphTooltip": 0,
   "id": 78,
-  "iteration": 1652432495354,
+  "iteration": 1652690783547,
   "links": [
     {
       "icon": "external link",
@@ -136,6 +139,10 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -276,7 +283,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.4.6",
+      "pluginVersion": "8.5.0",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -389,7 +396,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.4.6",
+      "pluginVersion": "8.5.0",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -502,7 +509,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.4.6",
+      "pluginVersion": "8.5.0",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -598,7 +605,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.4.6",
+      "pluginVersion": "8.5.0",
       "targets": [
         {
           "expr": "count(count by (collection) (solr_collections_replica_state{base_url=~\"$base_url\",collection=~\"$collection\",shard=~\"$shard\",replica=~\"$replica\",core=~\"$core\"}))",
@@ -654,7 +661,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "8.4.6",
+      "pluginVersion": "8.5.0",
       "targets": [
         {
           "expr": "count(solr_collections_replica_state{base_url=~\"$base_url\",collection=~\"$collection\",shard=~\"$shard\",replica=~\"$replica\",core=~\"$core\"})",
@@ -726,7 +733,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.4.6",
+      "pluginVersion": "8.5.0",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -7242,8 +7249,8 @@
       "type": "row"
     }
   ],
-  "refresh": "30s",
-  "schemaVersion": 35,
+  "refresh": "",
+  "schemaVersion": 36,
   "style": "dark",
   "tags": [
     "dev",
@@ -7495,6 +7502,6 @@
   "timezone": "browser",
   "title": "Solr Dashboard - DEV",
   "uid": "yt5eXHbMz5n",
-  "version": 4,
+  "version": 6,
   "weekStart": ""
 }

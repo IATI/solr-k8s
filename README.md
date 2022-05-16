@@ -239,7 +239,7 @@ helm upgrade mon prometheus-community/kube-prometheus-stack \
   --set grafana.enabled=true \
   --set grafana.persistence.enabled=true \
   --set grafana.persistence.size=10Gi \
-  --set grafana.'grafana\.ini'.server.root_url=https://dashboard.solr-$ENV.iatistandard.org/
+  --set grafana.'grafana\.ini'.server.root_url=https://dashboard.solr-dev.iatistandard.org/
 ```
 
 ```bash
