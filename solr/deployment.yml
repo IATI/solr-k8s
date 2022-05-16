@@ -11,10 +11,10 @@ spec:
         manualrestart: "2021-11-18T15:19:00Z"
       resources:
         limits:
-          memory: 10Gi
+          memory: 8Gi
         requests:
-          cpu: 2000m
-          memory: 10Gi
+          cpu: 1500m
+          memory: 8Gi
       initContainers:
         - name: set-zone
           image: roffe/kubectl
