@@ -33,7 +33,8 @@ az aks create \
     --node-vm-size "standard_B4ms" \
     --vm-set-type VirtualMachineScaleSets \
     --load-balancer-sku standard \
-    --node-count 1
+    --node-count 1 \
+    --auto-upgrade-channel stable # auto-upgrade dev cluster ONLY
 
 # Get context of your cluster and set that as your kubectl context
 az aks get-credentials --resource-group $RG --name aks-solr-$ENV
