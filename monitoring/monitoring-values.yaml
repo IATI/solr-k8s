@@ -1,0 +1,8 @@
+grafana:
+  enabled: true
+  grafana.ini:
+    server:
+      root_url: https://dashboard.solr-dev.iatistandard.org/
+  persistence:
+    enabled: true
+    size: 10Gi
