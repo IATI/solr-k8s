@@ -1,0 +1,19 @@
+controller:
+  admissionWebhooks:
+    patch:
+      nodeSelector:
+        kubernetes.io/os: linux
+  config:
+    client-body-buffer-size: 50M
+    large-client-header-buffers: 4 128k
+    proxy-body-size: "0"
+  nodeSelector:
+    kubernetes.io/os: linux
+  replicaCount: 1
+  service:
+    annotations:
+      service.beta.kubernetes.io/azure-dns-label-name: aks-solr-test
+    loadBalancerIP: # IP ADDRESS
+defaultBackend:
+  nodeSelector:
+    kubernetes.io/os: linux

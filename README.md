@@ -61,15 +61,7 @@ helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-    --set controller.replicaCount=1 \
-    --set controller.nodeSelector."kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
-    --set controller.admissionWebhooks.patch.nodeSelector."kubernetes\.io/os"=linux \
-    --set controller.service.loadBalancerIP="$IP_ADDRESS" \
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-$ENV" \
-    --set-string controller.config.proxy-body-size="0" \
-    --set-string controller.config.large-client-header-buffers="4 128k" \
-    --set-string controller.config.client-body-buffer-size="50M"
+    -f infrastructure/ingress/nginx-ingress-values.yaml
 
 # Check 
 kubectl get pods -l app.kubernetes.io/name=ingress-nginx \
@@ -83,12 +75,11 @@ az network public-ip list --resource-group $POD_RG --query "[?name=='pip-solr-$E
 
 ### Upgrade / Config Change NGINX
 
-https://github.com/kubernetes/ingress-nginx/
-
 ```zsh
+# get IP address from above and put in infrastructure/ingress/nginx-ingress-values.yaml file
+# modify parameters in yaml file
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-    # Above Values to re-use, or try --reuse-values
-    # ADD MORE
+    -f infrastructure/ingress/nginx-ingress-values.yaml
 ```
 
 Upgrade with same values
