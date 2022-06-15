@@ -8,10 +8,51 @@ NOTE: the current cluster is named `aks-solr-test` in resource group `rg-solr-te
 
 https://github.com/IATI/IATI-Internal-Wiki/blob/main/IATI-Unified-Infra/Solr.md#dev
 
+## Maintenance Steps/Setup
+
+### Prerequisites  
+
+- Azure CLI
+- Kubectl CLI
+
+### Setup
 ```bash
-# Get context of this cluster and set that as your kubectl context
-az aks get-credentials --resource-group aks-solr-test --name aks-solr-test
+# Get context of your cluster and set that as your kubectl context
+az aks get-credentials --resource-group <resource-group> --name <aks-cluster-name>
+
+# Check that it is your current context
+kubectl config get-contexts
 ```
+
+### Changing Helm-deployed components
+
+- Worth checking that what's currently deployed by helm matches the "values" files stored in source control
+
+```bash
+# export helm values as yaml
+helm get values <release-name> -o yaml > <path-to>*-values.yaml
+```
+
+- Then that yaml can be modified and used in an upgrade/re-deploy with the `-f <path-to-values-file>` flag
+
+### Changing kubectl deployed components
+
+- First diff what is currently deployed with the manifest you plan to change
+
+```bash
+kubectl diff -f <path-to-manifest>
+
+# e.g.
+kubectl diff -f solr/deployment.yml
+
+```
+
+- This should match what is in source control.
+
+- Make you change and run the diff again to see if the correct item will change
+
+- Apply `kubectl apply -f <path-to-manifest>`
+
 
 ## New Cluster Deployment Steps
 
