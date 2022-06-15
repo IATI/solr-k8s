@@ -302,16 +302,7 @@ Make persistent
 kubectl create ns monitoring
 helm upgrade --install mon prometheus-community/kube-prometheus-stack \
   -n monitoring \
-  --set kubeStateMetrics.enabled=false \
-  --set nodeExporter.enabled=false \
-  --set prometheusOperator.nodeSelector.nodepooltype=service \
-  --set prometheus.prometheusSpec.nodeSelector.nodepooltype=service \
-  --set alertmanager.alertmanagerSpec.nodeSelector.nodepooltype=service \
-  --set grafana.nodeSelector.nodepooltype=service \
-  --set grafana.enabled=true \
-  --set grafana.persistence.enabled=true \
-  --set grafana.persistence.size=10Gi \
-  --set grafana.'grafana\.ini'.server.root_url=https://dashboard.solr.iatistandard.org/
+  -f monitoring/monitoring-values.yaml
 
 ```
 

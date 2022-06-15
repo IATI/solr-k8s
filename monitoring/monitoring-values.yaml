@@ -1,0 +1,25 @@
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      nodepooltype: service
+grafana:
+  enabled: true
+  grafana.ini:
+    server:
+      root_url: https://dashboard.solr.iatistandard.org/
+  nodeSelector:
+    nodepooltype: service
+  persistence:
+    enabled: true
+    size: 10Gi
+kubeStateMetrics:
+  enabled: false
+nodeExporter:
+  enabled: false
+prometheus:
+  prometheusSpec:
+    nodeSelector:
+      nodepooltype: service
+prometheusOperator:
+  nodeSelector:
+    nodepooltype: service
