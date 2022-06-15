@@ -249,8 +249,7 @@ helm repo update
 kubectl create -f https://solr.apache.org/operator/downloads/crds/v0.5.1/all-with-dependencies.yaml
 helm upgrade --install solr-operator apache-solr/solr-operator \
  --version 0.5.1 \
- --set nodeSelector.nodepooltype=service \
- --set zookeeper-operator.nodeSelector.nodepooltype=service
+ -f solr/solr-operator-values.yaml
 
 # Check on whats running
 kubectl get pod -l control-plane=solr-operator
