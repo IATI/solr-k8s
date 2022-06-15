@@ -21,7 +21,7 @@ az aks create \
     --node-vm-size "Standard_B2s" \
     --vm-set-type VirtualMachineScaleSets \
     --load-balancer-sku standard \
-    --node-count 1 \
+    --node-count 2 \
     --nodepool-labels nodepooltype=service
 
 # Get context of your cluster and set that as your kubectl context
@@ -85,18 +85,7 @@ helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-    --set controller.replicaCount=2 \
-    --set controller.nodeSelector."kubernetes\.io/os"=linux \
-    --set controller.nodeSelector.nodepooltype=service \
-    --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector.nodepooltype=service \
-    --set controller.admissionWebhooks.patch.nodeSelector."kubernetes\.io/os"=linux \
-    --set controller.admissionWebhooks.patch.nodeSelector.nodepooltype=service \
-    --set controller.service.loadBalancerIP="$IP_ADDRESS" \
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-$ENV" \
-    --set-string controller.config.proxy-body-size="0" \
-    --set-string controller.config.large-client-header-buffers="4 128k" \
-    --set-string controller.config.client-body-buffer-size="50M"
+    -f infrastructure/ingress/nginx-ingress-values.yaml
 
 # Check 
 kubectl get pods -l app.kubernetes.io/name=ingress-nginx \
@@ -111,9 +100,10 @@ az network public-ip list --resource-group $POD_RG --query "[?name=='pip-solr-$E
 ### Upgrade / Config Change NGINX
 
 ```zsh
-# get IP address from above
+# get IP address from above and put in infrastructure/ingress/nginx-ingress-values.yaml file
+# modify parameters in yaml file
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-    # All of --set above and ADD MORE
+    -f infrastructure/ingress/nginx-ingress-values.yaml
 ```
 
 Upgrade with same values

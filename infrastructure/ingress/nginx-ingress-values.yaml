@@ -1,0 +1,39 @@
+controller:
+  admissionWebhooks:
+    patch:
+      nodeSelector:
+        kubernetes.io/os: linux
+        nodepooltype: service
+  config:
+    client-body-buffer-size: 50M
+    large-client-header-buffers: 4 128k
+    proxy-body-size: "0"
+  nodeSelector:
+    kubernetes.io/os: linux
+    nodepooltype: service
+  podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - ingress-nginx
+          - key: app.kubernetes.io/instance
+            operator: In
+            values:
+            - ingress-nginx
+          - key: app.kubernetes.io/component
+            operator: In
+            values:
+            - controller
+        topologyKey: "kubernetes.io/hostname"
+  replicaCount: 2
+  service:
+    annotations:
+      service.beta.kubernetes.io/azure-dns-label-name: aks-solr-new-PROD
+    loadBalancerIP: # IP ADDRESS
+defaultBackend:
+  nodeSelector:
+    kubernetes.io/os: linux
+    nodepooltype: service
