@@ -121,7 +121,7 @@ spec:
   solrAddressability:
     commonServicePort: 443
     external:
-      domainName: solr-new-prod.iatistandard.org
+      domainName: solr.iatistandard.org
       method: Ingress
       nodePortOverride: 443
       useExternalAddress: false
