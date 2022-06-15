@@ -8,22 +8,24 @@ Repo containing kubernetes deployment information for IATI Solr Production insta
 
 ```bash
 # Create resource group
-az group create --resource-group rg-solr-PROD --location uksouth
-RG=rg-solr-PROD
+ENV=new-PROD
+RG=rg-solr-$ENV
+az group create --resource-group $RG --location uksouth
 
-# Creating AKS Cluster with 3 nodes across availability zones
+# Creating AKS Cluster with 1 nodes across availability zones
+NAME=aks-solr-new-PROD
 az aks create \
     --resource-group $RG \
-    --name aks-solr-PROD \
+    --name $NAME \
     --generate-ssh-keys \
-    --node-vm-size "Standard_E2as_v4" \
+    --node-vm-size "Standard_B2s" \
     --vm-set-type VirtualMachineScaleSets \
     --load-balancer-sku standard \
-    --node-count 3 \
-    --zones 1 2 3
+    --node-count 2 \
+    --nodepool-labels nodepooltype=service
 
 # Get context of your cluster and set that as your kubectl context
-az aks get-credentials --resource-group $RG --name aks-solr-PROD
+az aks get-credentials --resource-group $RG --name $NAME
 
 # list nodes in cluster and zones
 kubectl get nodes -o custom-columns=NAME:'{.metadata.name}',REGION:'{.metadata.labels.topology\.kubernetes\.io/region}',ZONE:'{metadata.labels.topology\.kubernetes\.io/zone}'
@@ -71,9 +73,11 @@ https://docs.microsoft.com/en-gb/azure/aks/upgrade-cluster
 ### Ingress
 
 ```bash
+ENV=new-PROD
+
 # Create Public IP in Azure
-POD_RG=$(az aks show --resource-group $RG --name aks-solr-PROD --query nodeResourceGroup -o tsv)
-IP_ADDRESS=$(az network public-ip create --resource-group $POD_RG --name pip-solr-PROD --sku Standard --allocation-method static --query publicIp.ipAddress -o tsv)
+POD_RG=$(az aks show --resource-group $RG --name $NAME --query nodeResourceGroup -o tsv)
+IP_ADDRESS=$(az network public-ip create --resource-group $POD_RG --name pip-solr-$ENV --sku Standard --allocation-method static --query publicIp.ipAddress -o tsv)
 
 # Add the ingress-nginx repository
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -81,15 +85,7 @@ helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-    --set controller.replicaCount=2 \
-    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set controller.service.loadBalancerIP="$IP_ADDRESS" \
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-prod" \
-    --set-string controller.config.proxy-body-size="0" \
-    --set-string controller.config.large-client-header-buffers="4 128k" \
-    --set-string controller.config.client-body-buffer-size="50M"
+    -f infrastructure/ingress/nginx-ingress-values.yaml
 
 # Check 
 kubectl get pods -l app.kubernetes.io/name=ingress-nginx \
@@ -97,23 +93,17 @@ kubectl get pods -l app.kubernetes.io/name=ingress-nginx \
 
 kubectl get services -o wide -w nginx-ingress-ingress-nginx-controller
 
-az network public-ip list --resource-group $POD_RG --query "[?name=='pip-solr-PROD'].[dnsSettings.fqdn]" -o tsv
+az network public-ip list --resource-group $POD_RG --query "[?name=='pip-solr-$ENV'].[dnsSettings.fqdn]" -o tsv
 # aks-solr-prod.uksouth.cloudapp.azure.com
 ```
 
 ### Upgrade / Config Change NGINX
 
 ```zsh
+# get IP address from above and put in infrastructure/ingress/nginx-ingress-values.yaml file
+# modify parameters in yaml file
 helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-    --set controller.replicaCount=2 \
-    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set controller.service.loadBalancerIP="$IP_ADDRESS" \
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="aks-solr-prod" \
-    --set-string controller.config.proxy-body-size="0" \
-    --set-string controller.config.large-client-header-buffers="4 512K" \
-    --set-string controller.config.client-header-buffer-size="512K"
+    -f infrastructure/ingress/nginx-ingress-values.yaml
 ```
 
 Upgrade with same values
@@ -127,7 +117,9 @@ https://github.com/bitnami-labs/sealed-secrets#installation
 
 #### Install Sealed Secrets
 ```bash
-kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.16.0/controller.yaml
+helm upgrade --install sealed-secrets sealed-secrets \
+--repo https://bitnami-labs.github.io/sealed-secrets \
+--set nodeSelector.nodepooltype=service
 ```
 
 #### Install kubeseal
@@ -145,22 +137,32 @@ Commit my-secret-sealed.yaml into git with no worries. Delete my-secret.yaml
 
 Install cert-manager (if not already installed): https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#use-cert-manager-to-issue-the-certificate
 
+```bash
+# Install CRDs separately to allow you to easily uninstall and reinstall cert-manager without deleting your installed custom resources.
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.crds.yaml
+# Install cert-manager from helm chart
+helm upgrade --install cert-manager --version v1.8.0 jetstack/cert-manager \
+  --set nodeSelector.nodepooltype=service \
+  --set webhook.nodeSelector.nodepooltype=service \
+  --set cainjector.nodeSelector.nodepooltype=service
+```
+
 Issue Certifiate Using Cloudflare DNS lookup challenge cert-manager
 https://cert-manager.io/docs/configuration/acme/dns01/cloudflare/
 
-```bash
-# Install cert-manager from helm chart
-helm install cert-manager jetstack/cert-manager \
-  --version v1.3.1 \
-  --set installCRDs=true
-```
+Add DNS A-records in Cloudflare
 
 ```bash
 # Create certificate ClusterIssuer
-kubectl apply -f infrastructure/certificates/cert-issuer.yml
+cd infrastructure/certificates/secrets
+# Populate cloudflare-api-token-secret.yaml with real API Token from cloudflare
+kubeseal --controller-name sealed-secrets --controller-namespace default -o yaml < cloudflare-api-token-secret.yaml > cloudflare-api-token-sealed.yaml
+kubectl apply -f cloudflare-api-token-sealed.yaml # api token secret, needs to be re-created per cluster
+kubectl apply -f ../cert-issuer.yml
 
 # Issue certificate
-kubectl apply -f infrastructure/certificates/certificate.yml
+kubectl apply -f pkcs12-keystore-password-secret.yaml # password, needs to be re-created per cluster, sealed doesn't work for Solr.
+kubectl apply -f ../certificate.yml
 
 # Check Progress
 kubectl get certificates
@@ -209,11 +211,32 @@ Use [cert-manager kubectl plugin](https://cert-manager.io/docs/usage/kubectl-plu
 ### Upgrading cert-manager
 https://cert-manager.io/docs/installation/upgrading/
 
-```bash
-helm upgrade --version v1.6.1 cert-manager jetstack/cert-manager
-```
 
 ### Solr Cloud
+
+#### Add Node Pool
+
+https://docs.microsoft.com/en-us/azure/aks/use-multiple-node-pools#add-a-node-pool
+
+```bash
+az aks nodepool add \
+    --resource-group $RG \
+    --cluster-name $NAME \
+    --name solrnodepool \
+    --node-count 3 \
+    --node-vm-size "Standard_E2as_v4" \
+    --zones 1 2 3 \
+    --labels nodepooltype=solr
+
+# list out nodes and zones
+kubectl get nodes -o custom-columns=NAME:'{.metadata.name}',REGION:'{.metadata.labels.topology\.kubernetes\.io/region}',ZONE:'{metadata.labels.topology\.kubernetes\.io/zone}'
+
+# NAME                                   REGION    ZONE
+# aks-nodepool1-25948960-vmss000000      uksouth   0
+# aks-solrnodepool-16208013-vmss000000   uksouth   uksouth-1
+# aks-solrnodepool-16208013-vmss000001   uksouth   uksouth-2
+# aks-solrnodepool-16208013-vmss000002   uksouth   uksouth-3
+```
 
 https://apache.github.io/solr-operator/docs/running-the-operator
 
@@ -223,9 +246,11 @@ helm repo add apache-solr https://solr.apache.org/charts
 helm repo update
 
 # Install helm chart and then solr-operator
-kubectl create -f https://solr.apache.org/operator/downloads/crds/v0.5.0/all-with-dependencies.yaml
+kubectl create -f https://solr.apache.org/operator/downloads/crds/v0.5.1/all-with-dependencies.yaml
 helm upgrade --install solr-operator apache-solr/solr-operator \
-  --version 0.5.0
+ --version 0.5.1 \
+ --set nodeSelector.nodepooltype=service \
+ --set zookeeper-operator.nodeSelector.nodepooltype=service
 
 # Check on whats running
 kubectl get pod -l control-plane=solr-operator
@@ -233,6 +258,9 @@ kubectl describe pod -l control-plane=solr-operator
 
 # Verify zookeeper
 kubectl get pod -l component=zookeeper-operator
+
+# Create service permissions for zone setting on node
+k apply -f infrastructure/auth/service-account.yml
 
 # Deploy
 kubectl apply -f solr/deployment.yml
@@ -242,7 +270,7 @@ kubectl get solrclouds -w
 
 # check ingress config for URL
 kubectl get ingress
-kubectl describe ingress iati-prod-solrcloud-common
+kubectl describe ingress iati-$ENV-solrcloud-common
 
 # Get initial credentials for admin user, if password is changed using admin API, the secret is NOT updated.
 kubectl get secret iati-prod-solrcloud-security-bootstrap \
@@ -269,15 +297,23 @@ kubectl get po -l solr-cloud=iati-prod,technology=zookeeper \
 Install Prometheus stack
 https://apache.github.io/solr-operator/docs/solr-prometheus-exporter/#prometheus-stack
 
+
 Make persistent
-```
-helm upgrade mon prometheus-community/kube-prometheus-stack \
+```bash
+kubectl create ns monitoring
+helm upgrade --install mon prometheus-community/kube-prometheus-stack \
   -n monitoring \
-  --install \
+  --set kubeStateMetrics.enabled=false \
+  --set nodeExporter.enabled=false \
+  --set prometheusOperator.nodeSelector.nodepooltype=service \
+  --set prometheus.prometheusSpec.nodeSelector.nodepooltype=service \
+  --set alertmanager.alertmanagerSpec.nodeSelector.nodepooltype=service \
+  --set grafana.nodeSelector.nodepooltype=service \
   --set grafana.enabled=true \
   --set grafana.persistence.enabled=true \
   --set grafana.persistence.size=10Gi \
   --set grafana.'grafana\.ini'.server.root_url=https://dashboard.solr.iatistandard.org/
+
 ```
 
 ```bash

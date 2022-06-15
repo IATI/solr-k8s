@@ -3,7 +3,7 @@ kind: ClusterIssuer
 metadata:
   creationTimestamp: null
   name: letsencrypt
-  namespace: cert-manager
+  namespace: default
 spec:
   acme:
     email: code@iatistandard.org
@@ -14,7 +14,7 @@ spec:
     solvers:
     - dns01:
         cloudflare:
+          email: niko@devinit.org
           apiTokenSecretRef:
             key: api-token
             name: cloudflare-api-token-secret
-          email: niko@devinit.org
