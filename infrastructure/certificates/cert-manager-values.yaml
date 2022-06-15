@@ -1,0 +1,8 @@
+cainjector:
+  nodeSelector:
+    nodepooltype: service
+nodeSelector:
+  nodepooltype: service
+webhook:
+  nodeSelector:
+    nodepooltype: service

@@ -142,9 +142,7 @@ Install cert-manager (if not already installed): https://apache.github.io/solr-o
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.crds.yaml
 # Install cert-manager from helm chart
 helm upgrade --install cert-manager --version v1.8.0 jetstack/cert-manager \
-  --set nodeSelector.nodepooltype=service \
-  --set webhook.nodeSelector.nodepooltype=service \
-  --set cainjector.nodeSelector.nodepooltype=service
+  -f infrastructure/certificates/cert-manager-values.yaml
 ```
 
 Issue Certifiate Using Cloudflare DNS lookup challenge cert-manager
