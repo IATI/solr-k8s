@@ -231,7 +231,7 @@ kubectl get secret iati-$ENV-solrcloud-security-bootstrap -o jsonpath='{.data.so
 
 ```
 
-### Monitoring
+### Monitoring (Grafana)
 
 Install Prometheus stack
 https://apache.github.io/solr-operator/docs/solr-prometheus-exporter/#prometheus-stack
@@ -283,13 +283,33 @@ http://localhost:3000
 username: admin
 initial pw: prom-operator
 
-Import Dashboard id: `12456`
-Data source: Prometheus
+#### Login and change password, or use Grafana CLI. CLI can be used to reset pw if forgotten
+
+```bash
+k exec -n monitoring <grafana-pod-name> -c grafana -- grafana-cli admin reset-admin-password <pw>
+```
+
+#### Ingress for dashboard
 
 ```bash
 # Add ingress rule to allow dashboard access at dashboard.solr-$ENV.iatistandard.org
 kubectl apply -f infrastructure/ingress/dashboard-ingress.yml
 ``` 
+#### Importing a Dashboard
+
+##### From the Source
+Import Dashboard id: `12456`
+Data source: Prometheus
+
+##### From existing IATI Dashboard
+Use this to keep our custom charts and alerts
+
+Import > Upload JSON File > `monitoring/Grafana_Dashboard_Dev.json`
+
+### Monitoring (Azure Monitor)
+
+- Follow instructions [here](https://docs.microsoft.com/en-us/azure/aks/monitor-aks#configure-monitoring)
+
 
 ## Logs
 Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Solr. Otherwise the errors are about syncing between the replicas and not the root error.
