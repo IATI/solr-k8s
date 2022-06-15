@@ -2,6 +2,12 @@
 
 Repo containing kubernetes deployment information for IATI Solr Production instance
 
+## Current Cluster
+
+NOTE: the current cluster is named `aks-solr-new-Prod` in resource group `rg-solr-PROD`. The deployment instructions assume you're creating a NEW cluster called `aks-solr-<new-env>`. 
+
+https://github.com/IATI/IATI-Internal-Wiki/blob/main/IATI-Unified-Infra/Solr.md#prd
+
 ## Maintenance Steps/Setup
 
 ### Prerequisites  
