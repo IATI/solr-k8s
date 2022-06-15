@@ -15,7 +15,7 @@ spec:
         limits:
           memory: 9Gi
         requests:
-          cpu: 900m
+          cpu: 800m
           memory: 9Gi
       initContainers:
         - name: set-zone
@@ -134,5 +134,11 @@ spec:
     keyStorePasswordSecret:
       name: pkcs12-password-secret-prod
       key: password-key
+    trustStorePasswordSecret:
+      name: lets-encrypt-truststore-secret
+      key: password-key
+    trustStoreSecret:
+      name: lets-encrypt-truststore-secret
+      key: truststore.p12
   solrSecurity:
     authenticationType: Basic
