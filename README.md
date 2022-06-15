@@ -292,7 +292,7 @@ kubectl get po -l solr-cloud=iati-prod,technology=zookeeper \
 # 3
 ```
 
-### Monitoring
+### Monitoring (Grafana)
 
 Install Prometheus stack
 https://apache.github.io/solr-operator/docs/solr-prometheus-exporter/#prometheus-stack
@@ -376,6 +376,10 @@ Use this to keep our custom charts and alerts
 
 Import > Upload JSON File > `monitoring/Grafana_Dashboard_Prod.json`
 
+### Monitoring (Azure Monitor)
+
+- Follow instructions [here](https://docs.microsoft.com/en-us/azure/aks/monitor-aks#configure-monitoring)
+
 ## Logs
 Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Solr. Otherwise the errors are about syncing between the replicas and not the root error.
 ```bash
@@ -453,9 +457,6 @@ Show installed charts information
 `helm list --namespace <namespace:default>`
 
 ## Clean up
-
-## DELETE Entire RG
-`az group delete --name rg-solr-PROD --yes --no-wait`
 
 ### Pods from a config
 
