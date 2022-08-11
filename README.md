@@ -13,7 +13,7 @@ https://github.com/IATI/IATI-Internal-Wiki/blob/main/IATI-Unified-Infra/Solr.md#
 ### Prerequisites  
 
 - Azure CLI
-- Kubectl CLI
+- Kubectl CLI (`az aks install-cli`)
 
 ### Setup
 ```bash
