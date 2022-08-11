@@ -13,7 +13,7 @@ https://github.com/IATI/IATI-Internal-Wiki/blob/main/IATI-Unified-Infra/Solr.md#
 ### Prerequisites  
 
 - Azure CLI
-- Kubectl CLI
+- Kubectl CLI (`az aks install-cli`)
 
 ### Setup
 ```bash
@@ -339,6 +339,11 @@ Import > Upload JSON File > `monitoring/Grafana_Dashboard_Dev.json`
 
 - Follow instructions [here](https://docs.microsoft.com/en-us/azure/aks/monitor-aks#configure-monitoring)
 
+#### Custom ConfigMap
+
+Azure Log Analytics will collect a TON of data by default and is $$$. To turn off log collection from the `monitoring` namespace, and turn of monitoring of Env Vars, apply this manifest `infrastructure/logging/container-azm-ms-agentconfig.yaml`
+
+Reference: https://laptrinhx.com/reduce-oms-logs-for-aks-3884804101/ (we do not want to turn off ALL stout and stderr logs like the article though)
 
 ## Logs
 Dump exceptions (+5 lines) from Solr - make sure you have the leader pod for Solr. Otherwise the errors are about syncing between the replicas and not the root error.
