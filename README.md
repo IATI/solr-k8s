@@ -63,7 +63,8 @@ ENV=new-PROD
 RG=rg-solr-$ENV
 az group create --resource-group $RG --location uksouth
 
-# Creating AKS Cluster with 1 nodes across availability zones
+# Creating AKS Cluster with 2 nodes in the service nodepool, with possible autoscaling to 3 nodes
+# This will run shared workloads (not the Solr application pods)
 NAME=aks-solr-new-PROD
 az aks create \
     --resource-group $RG \
@@ -73,7 +74,10 @@ az aks create \
     --vm-set-type VirtualMachineScaleSets \
     --load-balancer-sku standard \
     --node-count 2 \
-    --nodepool-labels nodepooltype=service
+    --nodepool-labels nodepooltype=service \
+    --enable-cluster-autoscaler \
+    --min-count 2 \
+    --max-count 3
 
 # Get context of your cluster and set that as your kubectl context
 az aks get-credentials --resource-group $RG --name $NAME
@@ -231,7 +235,7 @@ https://cert-manager.io/docs/installation/upgrading/
 
 ### Solr Cloud
 
-#### Add Node Pool
+#### Add Solr Node Pool
 
 https://docs.microsoft.com/en-us/azure/aks/use-multiple-node-pools#add-a-node-pool
 
