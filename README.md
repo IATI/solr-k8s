@@ -377,23 +377,35 @@ Apply:
 ### Notes
 - Upgrading from 8.8.2 to 8.9.0 took approximately ~4hrs. Recommended to take a downtime for this by Solr docs.
 
+## Upgrading Zookeeper
+
+Update tag to version in `solr/deployment.yml`
+
+```yaml
+zookeeperRef:
+    provided:
+      chroot: /iatisolrdev
+      image:
+        pullPolicy: IfNotPresent
+        repository: pravega/zookeeper
+        tag: 0.2.14
+```
+
 ## Upgrade Solr Operator Helm Chart
 https://artifacthub.io/packages/helm/apache-solr/solr-operator#upgrading-the-solr-operator
 
 ```
-> kubectl replace -f https://solr.apache.org/operator/downloads/crds/v0.5.0/all-with-dependencies.yaml
+❯ kubectl replace -f https://solr.apache.org/operator/downloads/crds/v0.6.0/all-with-dependencies.yaml
 
 customresourcedefinition.apiextensions.k8s.io/solrbackups.solr.apache.org replaced
 customresourcedefinition.apiextensions.k8s.io/solrclouds.solr.apache.org replaced
 customresourcedefinition.apiextensions.k8s.io/solrprometheusexporters.solr.apache.org replaced
 customresourcedefinition.apiextensions.k8s.io/zookeeperclusters.zookeeper.pravega.io replaced
 
-> helm repo update
-> helm upgrade solr-operator apache-solr/solr-operator --version 0.5.0
-
+❯ helm upgrade solr-operator apache-solr/solr-operator --version 0.6.0
 Release "solr-operator" has been upgraded. Happy Helming!
 NAME: solr-operator
-LAST DEPLOYED: Mon Nov 22 14:28:48 2021
+LAST DEPLOYED: Wed Aug 17 14:50:49 2022
 NAMESPACE: default
 STATUS: deployed
 REVISION: 2
@@ -411,6 +423,11 @@ Solr-Operator successfully installed!
   - restarted the solr pod
   - was back up in ~2min
   - Collections still there, integration tests passed
+
+- v0.5.0 -> v0.6.0
+  - restarted operator pods
+  - restarted solr pod
+  - was back up in ~2min
 
 ## Helm
 Show installed charts information
