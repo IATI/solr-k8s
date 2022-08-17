@@ -391,6 +391,13 @@ zookeeperRef:
         tag: 0.2.14
 ```
 
+### Notes
+- 0.2.12 -> 0.2.14
+  - Caused termination/restart of zookeeper pod
+  - Took a few minutes
+  - No noticeable downtime on Solr API
+
+
 ## Upgrade Solr Operator Helm Chart
 https://artifacthub.io/packages/helm/apache-solr/solr-operator#upgrading-the-solr-operator
 
