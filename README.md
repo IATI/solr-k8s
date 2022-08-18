@@ -467,6 +467,26 @@ Apply:
 ### Notes
 - Upgrading from 8.8.2 to 8.9.0 took approximately ~4hrs. Recommended to take a downtime for this by Solr docs.
 
+## Upgrading Zookeeper
+
+Update tag to version in `solr/deployment.yml`
+
+```yaml
+zookeeperRef:
+    provided:
+      chroot: /iatisolrdev
+      image:
+        pullPolicy: IfNotPresent
+        repository: pravega/zookeeper
+        tag: 0.2.14
+```
+
+### Notes
+- 0.2.12 -> 0.2.14
+  - Caused termination/restart of zookeeper pods
+  - Took a few minutes each
+  - No downtime on Solr API, due to 3 pods doing a rolling restart
+
 ## Upgrade Solr Operator Helm Chart
 https://apache.github.io/solr-operator/docs/upgrade-notes.html
 https://artifacthub.io/packages/helm/apache-solr/solr-operator#upgrading-the-solr-operator
