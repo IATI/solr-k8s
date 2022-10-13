@@ -10,7 +10,7 @@ spec:
       resources:
         requests:
           cpu: 300m
-          memory: 900Mi
+          memory: 800Mi
   solrReference:
     cloud:
       name: iati-prod
