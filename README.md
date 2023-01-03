@@ -125,7 +125,8 @@ helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
 
 Upgrade with same values
 ```zsh
-helm upgrade --reuse-values nginx-ingress ingress-nginx/ingress-nginx
+helm get values nginx-ingress -o yaml > infrastructure/ingress/nginx-ingress-values.yaml
+helm upgrade nginx-ingress ingress-nginx/ingress-nginx -f infrastructure/ingress/nginx-ingress-values.yaml
 ```
 
 ### Secrets

@@ -13,6 +13,7 @@ controller:
   service:
     annotations:
       service.beta.kubernetes.io/azure-dns-label-name: aks-solr-test
+      service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
     loadBalancerIP: # IP ADDRESS
 defaultBackend:
   nodeSelector:
