@@ -66,7 +66,7 @@ spec:
   replicas: 1
   solrImage:
     repository: solr
-    tag: 9.1.0
+    tag: 9.1.1
   solrJavaMem: -Xms3g -Xmx3g
   solrOpts: >
     -Dsolr.cloud.client.stallTime=30000 
