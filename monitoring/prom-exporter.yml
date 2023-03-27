@@ -24,3 +24,6 @@ spec:
         name: pkcs12-password-secret-prod
         key: password-key
   numThreads: 6
+  image:
+    repository: solr
+    tag: 9.1.1

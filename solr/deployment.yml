@@ -68,9 +68,15 @@ spec:
   replicas: 3
   solrImage:
     repository: solr
-    tag: 8.11.1
+    tag: 9.1.1
   solrJavaMem: -Xms3g -Xmx3g
-  solrOpts: "-Dlog4j2.formatMsgNoLookups=true -Dsolr.cloud.client.stallTime=30000 -Dsolr.environment=prod"
+  solrOpts: >
+    -Dsolr.cloud.client.stallTime=30000
+    -Dsolr.environment=prod
+    -Dsolr.modules=scripting
+    -Dsolrxsltloc=solr.scripting.xslt.XSLTResponseWriter
+    -Dsolr.pki.sendVersion=v1
+    -Dsolr.pki.acceptVersions=v1,v2
   solrLogLevel: WARN
   updateStrategy:
     managed:
