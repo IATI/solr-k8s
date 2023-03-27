@@ -32,7 +32,8 @@ controller:
   service:
     annotations:
       service.beta.kubernetes.io/azure-dns-label-name: aks-solr-new-PROD
-    loadBalancerIP: # IP ADDRESS
+      service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+    loadBalancerIP: 20.58.48.227
 defaultBackend:
   nodeSelector:
     kubernetes.io/os: linux
