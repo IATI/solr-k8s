@@ -75,7 +75,7 @@ spec:
     -Dsolr.environment=prod
     -Dsolr.modules=scripting
     -Dsolrxsltloc=solr.scripting.xslt.XSLTResponseWriter
-    -Dsolr.pki.sendVersion=v1
+    -Dsolr.pki.sendVersion=v2
     -Dsolr.pki.acceptVersions=v1,v2
   solrLogLevel: WARN
   updateStrategy:
