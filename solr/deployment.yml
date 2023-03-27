@@ -76,7 +76,7 @@ spec:
     -Dsolr.modules=scripting
     -Dsolrxsltloc=solr.scripting.xslt.XSLTResponseWriter
     -Dsolr.pki.sendVersion=v2
-    -Dsolr.pki.acceptVersions=v1,v2
+    -Dsolr.pki.acceptVersions=v2
   solrLogLevel: WARN
   updateStrategy:
     managed:
