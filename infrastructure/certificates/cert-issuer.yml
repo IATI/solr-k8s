@@ -14,7 +14,7 @@ spec:
     solvers:
     - dns01:
         cloudflare:
-          email: niko@devinit.org
+          email: code@iatistandard.org
           apiTokenSecretRef:
             key: api-token
             name: cloudflare-api-token-secret
